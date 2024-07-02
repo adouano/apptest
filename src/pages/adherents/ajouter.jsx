@@ -1,0 +1,318 @@
+import React, {useState, useEffect} from 'react';
+
+const AjoutAdherent = () => {
+    const [formData, setFormData] = useState({
+        numdvlottery:"",
+        numdossier:"",
+        nomfamille:"",
+        prenomfamille:"",
+        datenaissance:"",
+        lieunaissance:"",
+        genre:"",
+        pays:"",
+        email:"",
+        adresse:"",
+        paysresidence:"",
+        villeresidence:"",
+        quartier:"",
+        telephone:"",
+        telephone1:"",
+        photo:"",
+        niveauscolaire:"",
+        statutmarital:"",
+        nombrelative:""
+    });
+    // const [formError, setFormError] = useState({
+    //     numdvlottery:"",
+    //     numdossier:"",
+    //     nomfamille:"",
+    //     prenomfamille:"",
+    //     datenaissance:"",
+    //     lieunaissance:"",
+    //     genre:"",
+    //     pays:"",
+    //     email:"",
+    //     adresse:"",
+    //     paysresidence:"",
+    //     villeresidence:"",
+    //     quartier:"",
+    //     telephone:"",
+    //     telephone1:"",
+    //     photo:"",
+    //     niveauscolaire:"",
+    //     statutmarital:"",
+    //     nombrelative:"",
+    //     form:""
+    // });
+    const [formError, setFormError] = useState();
+
+    const [numDossier, setNumDossier] = useState(0);
+    useEffect(() => {
+        const NumDossierAleatoire = () => {
+            return Math.floor(Math.random() * (99999 - 1 + 1)) + 1;
+        }
+        setNumDossier(NumDossierAleatoire());
+    }, []);
+    const enrolDossier = new Date().getFullYear()+'GC'+numDossier;
+
+    const handleOnChange = (e) => {
+        const {name,value} = e.target;
+        setFormData({...formData, [name]:value});
+    }
+
+    const handleSubmit = (e) => {
+        // console.log(formData);
+        // console.dir(enrolDossier);
+        e.preventDefault(); 
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
+        // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+        // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_+-=[]{};':"|\\,.<>/?]).{8,}$/i;
+
+        if(!formData.numdossier || !formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.telephone1 || !formData.photo || !formData.niveauscolaire || !formData.statutmarital || !formData.nombrelative){
+            setFormError("Tous les champs sont obligatoires.");
+            return;
+        }
+        if(!emailRegex.test(formData.email)){
+            setFormError("Erreur de format email.");
+            return;
+        }
+        if(phoneRegex.test(formData.telephone)){
+        // if(!(formData.telephone.match('[0-9]{10}')) ){
+            setFormError("Entrer un numero de telephone valide.");
+            return;
+       }
+
+    }
+
+
+  return (
+    <>
+        <div className="container-xl p-5">
+            <div className="container-fluid">
+            <h1 className="page-title"> Nouveau Adhérent  </h1>
+                <div className="col-md-12 col-lg-12">
+                    <form onSubmit={handleSubmit}>
+
+                        <div className='row mb-3'>
+                            <div className="col-md-6">
+                                <label htmlFor="numdossier" className="form-label"> Numero de Dossier : </label>
+                                <input type="text" className="form-control" name="numdossier" id="numdossier" value={enrolDossier} placeholder="Numero de dossier" disabled />
+                            </div>
+                            <div className="col-md-6">
+                                <label htmlFor="numdvlottery" className="form-label"> Numero DV Lottery : </label>
+                                <input type="text" className="form-control" name="numdvlottery" id="numdvlottery" value="" placeholder="Numero de confirmation DV Lottery" disabled />
+                            </div>
+                        </div>
+
+                        <div className="row g-3">
+                            <div className="col-md-5">
+                                <label htmlFor="nomfamille" className="form-label"> Nom : </label>
+                                <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder="Komenan" onChange={handleOnChange} required />
+                                <div className="invalid-feedback">Le nom de famille est requis.</div>
+                                {formError.nomfamille && <p>Ce champ est obligatoire</p>}
+                            </div>
+                
+                            <div className="col-md-7">
+                                <label htmlFor="prenomfamille" className="form-label"> Prénoms : </label>
+                                <input type="text" className="form-control" name="prenomfamille" id="prenomfamille" placeholder="Gramboute Achi Franck" onChange={handleOnChange} required />
+                                <div className="invalid-feedback">Le prénom valide est requis.</div>
+                                {formError.prenomfamille && <p>Ce champ est obligatoire</p>}
+                            </div>
+                
+                            <div className="col-md-3">
+                                <label htmlFor="dnaissance" className="form-label"> Date de naissance : </label>
+                                <div className="input-group has-validation">
+                                    {/*<span className="input-group-text">@</span>*/}
+                                    <input type="date" className="form-control" name="datenaissance" id="datenaissance" onChange={handleOnChange} required />
+                                    <div className="invalid-feedback">La date de naissance est obligatoire.</div>
+                                    {formError.datenaissance && <p>Ce champ est obligatoire</p>}
+                                </div>
+                            </div>
+                
+                            <div className="col-md-6">
+                                <label htmlFor="lieunaissance" className="form-label"> Lieu de naissance : </label>
+                                <div className="input-group has-validation">
+                                    <input type="text" className="form-control" name="lieunaissance" id="lieunaissance" placeholder="Ville/Village/Commune de naissance" onChange={handleOnChange} required />
+                                    <div className="invalid-feedback">Le lieu de naissance est obligatoire.</div>
+                                    {formError.lieunaissance && <p>Ce champ est obligatoire</p>}
+                                </div>
+                            </div>
+                
+                            <div className="col-md-3">
+                                <label htmlFor="lnaissance" className="form-label"> Genre (Sexe) : </label><br/>
+                                <div className="form-check form-check-inline">
+                                    <input className="form-check-input" type="radio" name="genre" id="genre" value="homme" onChange={handleOnChange} required />
+                                    <label className="form-check-label" htmlFor="genre"> Homme </label>
+                                </div>
+                                <div className="form-check form-check-inline">
+                                    <input className="form-check-input" type="radio" name="genre" id="genre" value="femme" onChange={handleOnChange} required />
+                                    <label className="form-check-label" htmlFor="genre"> Femme </label>
+                                </div>
+                            </div>
+                
+                            <div className="col-md-6">
+                                <label htmlFor="pays" className="form-label"> Pays de naissance : <span className="text-body-secondary"></span></label>
+                                <input type="text" className="form-control" name="pays" id="pays" placeholder="Pays de naissance" onChange={handleOnChange} />
+                            </div>
+                
+                            <div className="col-md-6">
+                                <label htmlFor="email" className="form-label">Email <span className="text-body-secondary"></span></label>
+                                <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} />
+                                <div className="invalid-feedback">L'adresse e-mail est obligatoire.</div>
+                                {formError.email && <p>Ajouter une adresse email valide</p>}
+                            </div>
+                
+                            <div className="col-md-12">
+                                <label htmlFor="adresse" className="form-label"> Adresse : </label>
+                                <input type="text" className="form-control" name="adresse" id="adresse" placeholder="01 bp 1010 Abidjan 05" onChange={handleOnChange} required />
+                                <div className="invalid-feedback">Une adresse postale est requise.</div>
+                            </div>
+                
+                            <div className="col-md-5">
+                                <label htmlFor="paysresidence" className="form-label"> Pays de résidence : </label>
+                                <input type="text" className="form-control" name="paysresidence" id="paysresidence" placeholder="Pays d'habitation" onChange={handleOnChange} />
+                                <div className="invalid-feedback">Champ obligatoire.</div>
+                            </div>
+                
+                            <div className="col-md-4">
+                                <label htmlFor="villeresidence" className="form-label"> Ville de résidence : </label>
+                                <input type="text" className="form-control" name="villeresidence" id="villeresidence" placeholder="Ville d'habitation" onChange={handleOnChange} />
+                                <div className="invalid-feedback">Champ obligatoire.</div>
+                            </div>
+                
+                            <div className="col-md-3">
+                                <label htmlFor="quartier" className="form-label"> Quartier : </label>
+                                <input type="text" className="form-control" name="quartier" id="quartier" placeholder="Quartier d'habitation" onChange={handleOnChange} required />
+                                <div className="invalid-feedback">Champ obligatoire.</div>
+                            </div>
+                
+                            <div className="col-md-4">
+                                <label htmlFor="telephone" className="form-label"> Numéro de téléphone : </label>
+                                <input type="tel" className="form-control" name="telephone" id="telephone" placeholder="Contact téléphonique principal" maxLength="10" onChange={handleOnChange} />
+                                <div className="invalid-feedback">Champ obligatoire.</div>
+                            </div>
+                
+                            <div className="col-md-4">
+                                <label htmlFor="telephone1" className="form-label"> Numéro de téléphone : <span className="text-body-secondary">(Optionel)</span></label>
+                                <input type="tel" className="form-control" name="telephone1" id="telephone1" placeholder="Contact téléphonique secondaire" maxLength="10" onChange={handleOnChange} />
+                                <div className="invalid-feedback">Champ obligatoire.</div>
+                            </div>
+                
+                            <div className="col-md-4">
+                                <label htmlFor="photo" className="form-label"> Photo : </label>
+                                <input type="file" className="form-control" name="photo" id="photo" placeholder="Image" onChange={handleOnChange} />
+                                <small htmlFor=""> Telecharger la photo </small>
+                            </div>
+                        </div>
+            
+                        <hr className="my-4" />
+
+                        <div className="row">
+                            <div className="col-md-6">
+                                <h4 className=""> Etudes et Diplômes </h4>
+                                <div className="">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Ecole Primaire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Ecole Primaire </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Collège - Aucun diplôme" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Collège - Aucun diplôme </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Collège - Diplômé" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Collège - Diplômé </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Ecole Professionnelle" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Ecole Professionnelle </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Cours Universitaire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Cours Universitaires </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Diplôme Universitaire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Diplôme Universitaire </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Cours de Niveau Supérieur" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Cours de Niveau Supérieur </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Maîtrise" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Maîtrise </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Cours de Niveau Doctorat" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Cours de Niveau Doctorat </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Doctorat" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Doctorat </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Travailleur qualifié dans un métier qui nécessite au moins deux (2) ans de formation ou d'expérience" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="niveauscolaire"> Travailleur qualifié dans un métier qui nécessite au moins deux (2) ans de formation ou d'expérience </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <h4 className=""> Situation Matrimoniale </h4>
+                                <div className="">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Célibataire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="statutmarital"> Célibataire </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <div>
+                                            <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Marié(e)" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="statutmarital"> Marié(e) </label>
+                                        </div>
+                                        <small className=""> Epoux(se) n'est pas citoyen Americain ou résident permanent légal </small>
+                                    </div>
+                                    <div className="form-check">
+                                        <div>
+                                            <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Marié(e)-US" onChange={handleOnChange} />
+                                            <label className="form-check-label" htmlFor="statutmarital"> Marié(e) </label>
+                                        </div>
+                                        <small className=""> Epoux(se) est citoyen Americain ou résident permanent légal </small>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Divorcé(e)" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="statutmarital"> Divorcé(e) </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Veuf/Veuve" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="statutmarital"> Veuf/Veuve </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <div>
+                                            <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Séparés Légalement" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="statutmarital"> Séparés Légalement </label>
+                                        </div>
+                                        <small className=""> La séparation légale est un arrangement lorsqu'un couple reste marié mais vit séparé, suite à une décision de justice. </small>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <hr className="my-4" />
+                            <div className="col-md-12">
+                                <label htmlFor="nombrelative" className="form-label"> Nombre de protégé(s) : <span className="text-body-primary">(Optionel)</span></label>
+                                <input type="text" className="form-control" name="nombrelative" id="nombrelative" placeholder="Mettre 0 s'il n'y a personne" onChange={handleOnChange} />
+                            </div>
+                        </div>
+                        
+                        <hr className="my-4" />                
+                        <button className="w-30 btn btn-primary btn-lg" type="submit" onClick={handleSubmit}> Enregistrer </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </>
+  )
+}
+
+export default AjoutAdherent;

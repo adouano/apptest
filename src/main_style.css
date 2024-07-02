@@ -1,0 +1,55 @@
+*, *::after, *::before {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+#root {
+    margin: 0 auto;
+    position: relative;
+}
+.content{
+    max-width: 1280px;
+    padding: 2rem;
+    margin: 0 auto;
+    min-height: 100vh;
+    max-height: auto;
+}
+.content-wrap{
+    padding-bottom: 5rem;
+}
+.footer{
+    bottom: 0;
+    height: 5rem;
+    width: 100%;
+    /* position: absolute; */
+}
+.account-connect{
+    display: flex;
+    height: 100vh;
+}
+.account-acces{
+    max-width: 100%;
+    min-width: 400px;
+    margin: 0 auto;
+    padding: 0;
+    align-self: center;
+}
+.img-responsive {
+    width: 100%;
+}
+.login-box, .register-box {
+    width: 360px;
+}
+.pprofile{
+    width: 300px;
+    border: 1px dashed #aaa;
+    padding: 10px;
+    align-self: center;
+}
+.pprofile img{
+    width: 100%;
+}
+.preview{
+    /* border-radius: 10rem; */
+    border: 5px solid #eaf2ef;
+}
