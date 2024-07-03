@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { Alert } from 'react-bootstrap';
 
 const AjoutAdherent = () => {
     const [formData, setFormData] = useState({
@@ -22,29 +23,8 @@ const AjoutAdherent = () => {
         statutmarital:"",
         nombrelative:""
     });
-    // const [formError, setFormError] = useState({
-    //     numdvlottery:"",
-    //     numdossier:"",
-    //     nomfamille:"",
-    //     prenomfamille:"",
-    //     datenaissance:"",
-    //     lieunaissance:"",
-    //     genre:"",
-    //     pays:"",
-    //     email:"",
-    //     adresse:"",
-    //     paysresidence:"",
-    //     villeresidence:"",
-    //     quartier:"",
-    //     telephone:"",
-    //     telephone1:"",
-    //     photo:"",
-    //     niveauscolaire:"",
-    //     statutmarital:"",
-    //     nombrelative:"",
-    //     form:""
-    // });
     const [formError, setFormError] = useState();
+    const [profilePhoto, setProfilePhoto] = useState();
 
     const [numDossier, setNumDossier] = useState(0);
     useEffect(() => {
@@ -56,20 +36,23 @@ const AjoutAdherent = () => {
     const enrolDossier = new Date().getFullYear()+'GC'+numDossier;
 
     const handleOnChange = (e) => {
-        const {name,value} = e.target;
+        const {name,value,files} = e.target;
         setFormData({...formData, [name]:value});
+        if(files){
+            setProfilePhoto(URL.createObjectURL(files[0]));
+        }
     }
 
     const handleSubmit = (e) => {
-        // console.log(formData);
-        // console.dir(enrolDossier);
+        console.log(formData);
+        console.dir(enrolDossier);
         e.preventDefault(); 
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-        const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
+        // const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
         // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
         // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_+-=[]{};':"|\\,.<>/?]).{8,}$/i;
 
-        if(!formData.numdossier || !formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.telephone1 || !formData.photo || !formData.niveauscolaire || !formData.statutmarital || !formData.nombrelative){
+        if(!formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.photo || !formData.niveauscolaire || !formData.statutmarital){
             setFormError("Tous les champs sont obligatoires.");
             return;
         }
@@ -77,9 +60,9 @@ const AjoutAdherent = () => {
             setFormError("Erreur de format email.");
             return;
         }
-        if(phoneRegex.test(formData.telephone)){
-        // if(!(formData.telephone.match('[0-9]{10}')) ){
-            setFormError("Entrer un numero de telephone valide.");
+        // if(phoneRegex.test(formData.telephone)){
+        if(!(formData.telephone.match('[0-9]{10}')) ){
+            setFormError("Le numero de telephone doit contenir 10 caracteres.");
             return;
        }
 
@@ -92,12 +75,14 @@ const AjoutAdherent = () => {
             <div className="container-fluid">
             <h1 className="page-title"> Nouveau Adhérent  </h1>
                 <div className="col-md-12 col-lg-12">
+
+                {formError && <Alert className="alert alert-danger">{formError}</Alert>}
                     <form onSubmit={handleSubmit}>
 
                         <div className='row mb-3'>
                             <div className="col-md-6">
                                 <label htmlFor="numdossier" className="form-label"> Numero de Dossier : </label>
-                                <input type="text" className="form-control" name="numdossier" id="numdossier" value={enrolDossier} placeholder="Numero de dossier" disabled />
+                                <input type="text" className="form-control" name="numdossier" id="numdossier" value={enrolDossier} onChange={handleOnChange} disabled />
                             </div>
                             <div className="col-md-6">
                                 <label htmlFor="numdvlottery" className="form-label"> Numero DV Lottery : </label>
@@ -110,23 +95,20 @@ const AjoutAdherent = () => {
                                 <label htmlFor="nomfamille" className="form-label"> Nom : </label>
                                 <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder="Komenan" onChange={handleOnChange} required />
                                 <div className="invalid-feedback">Le nom de famille est requis.</div>
-                                {formError.nomfamille && <p>Ce champ est obligatoire</p>}
                             </div>
                 
                             <div className="col-md-7">
                                 <label htmlFor="prenomfamille" className="form-label"> Prénoms : </label>
                                 <input type="text" className="form-control" name="prenomfamille" id="prenomfamille" placeholder="Gramboute Achi Franck" onChange={handleOnChange} required />
                                 <div className="invalid-feedback">Le prénom valide est requis.</div>
-                                {formError.prenomfamille && <p>Ce champ est obligatoire</p>}
                             </div>
                 
                             <div className="col-md-3">
-                                <label htmlFor="dnaissance" className="form-label"> Date de naissance : </label>
+                                <label htmlFor="datenaissance" className="form-label"> Date de naissance : </label>
                                 <div className="input-group has-validation">
                                     {/*<span className="input-group-text">@</span>*/}
                                     <input type="date" className="form-control" name="datenaissance" id="datenaissance" onChange={handleOnChange} required />
                                     <div className="invalid-feedback">La date de naissance est obligatoire.</div>
-                                    {formError.datenaissance && <p>Ce champ est obligatoire</p>}
                                 </div>
                             </div>
                 
@@ -135,20 +117,20 @@ const AjoutAdherent = () => {
                                 <div className="input-group has-validation">
                                     <input type="text" className="form-control" name="lieunaissance" id="lieunaissance" placeholder="Ville/Village/Commune de naissance" onChange={handleOnChange} required />
                                     <div className="invalid-feedback">Le lieu de naissance est obligatoire.</div>
-                                    {formError.lieunaissance && <p>Ce champ est obligatoire</p>}
                                 </div>
                             </div>
                 
                             <div className="col-md-3">
-                                <label htmlFor="lnaissance" className="form-label"> Genre (Sexe) : </label><br/>
+                                <label className="form-label"> Genre (Sexe) : <br/>
                                 <div className="form-check form-check-inline">
-                                    <input className="form-check-input" type="radio" name="genre" id="genre" value="homme" onChange={handleOnChange} required />
-                                    <label className="form-check-label" htmlFor="genre"> Homme </label>
+                                    <input className="form-check-input" type="radio" name="genre" id="homme" value="homme" onChange={handleOnChange} required />
+                                    <label className="form-check-label" htmlFor="homme"> Homme </label>
                                 </div>
                                 <div className="form-check form-check-inline">
-                                    <input className="form-check-input" type="radio" name="genre" id="genre" value="femme" onChange={handleOnChange} required />
-                                    <label className="form-check-label" htmlFor="genre"> Femme </label>
+                                    <input className="form-check-input" type="radio" name="genre" id="femme" value="femme" onChange={handleOnChange} required />
+                                    <label className="form-check-label" htmlFor="femme"> Femme </label>
                                 </div>
+                                </label>
                             </div>
                 
                             <div className="col-md-6">
@@ -158,9 +140,9 @@ const AjoutAdherent = () => {
                 
                             <div className="col-md-6">
                                 <label htmlFor="email" className="form-label">Email <span className="text-body-secondary"></span></label>
-                                <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} />
+                                <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} autoComplete="off" />
                                 <div className="invalid-feedback">L'adresse e-mail est obligatoire.</div>
-                                {formError.email && <p>Ajouter une adresse email valide</p>}
+                                {/* {formError.email && <p>Ajouter une adresse email valide</p>} */}
                             </div>
                 
                             <div className="col-md-12">
@@ -202,7 +184,12 @@ const AjoutAdherent = () => {
                             <div className="col-md-4">
                                 <label htmlFor="photo" className="form-label"> Photo : </label>
                                 <input type="file" className="form-control" name="photo" id="photo" placeholder="Image" onChange={handleOnChange} />
-                                <small htmlFor=""> Telecharger la photo </small>
+                                <small> Telecharger la photo </small>
+                            </div>
+                            <div className="col-md-12 mt-2 d-flex justify-content-center">
+                                {profilePhoto &&
+                                    <div className="pprofile"><img src={profilePhoto} alt='' className='preview' /></div>
+                                }
                             </div>
                         </div>
             
@@ -213,48 +200,48 @@ const AjoutAdherent = () => {
                                 <h4 className=""> Etudes et Diplômes </h4>
                                 <div className="">
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Ecole Primaire" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Ecole Primaire </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="primaire" value="Ecole Primaire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="primaire"> Ecole Primaire </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Collège - Aucun diplôme" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Collège - Aucun diplôme </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="collegesansdiplome" value="Collège - Aucun diplôme" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="collegesansdiplome"> Collège - Aucun diplôme </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Collège - Diplômé" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Collège - Diplômé </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="collegeavecdiplome" value="Collège - Diplômé" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="collegeavecdiplome"> Collège - Diplômé </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Ecole Professionnelle" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Ecole Professionnelle </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="ecoleprof" value="Ecole Professionnelle" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="ecoleprof"> Ecole Professionnelle </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Cours Universitaire" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Cours Universitaires </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="coursuniversitaire" value="Cours Universitaire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="coursuniversitaire"> Cours Universitaires </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Diplôme Universitaire" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Diplôme Universitaire </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="diplomeuniversitaire" value="Diplôme Universitaire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="diplomeuniversitaire"> Diplôme Universitaire </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Cours de Niveau Supérieur" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Cours de Niveau Supérieur </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="superieur" value="Cours de Niveau Supérieur" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="superieur"> Cours de Niveau Supérieur </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Maîtrise" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Maîtrise </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="maitrise" value="Maîtrise" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="maitrise"> Maîtrise </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Cours de Niveau Doctorat" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Cours de Niveau Doctorat </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="nivdoctorat" value="Cours de Niveau Doctorat" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="nivdoctorat"> Cours de Niveau Doctorat </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Doctorat" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Doctorat </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="doctorat" value="Doctorat" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="doctorat"> Doctorat </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="niveauscolaire" value="Travailleur qualifié dans un métier qui nécessite au moins deux (2) ans de formation ou d'expérience" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="niveauscolaire"> Travailleur qualifié dans un métier qui nécessite au moins deux (2) ans de formation ou d'expérience </label>
+                                        <input className="form-check-input" type="radio" name="niveauscolaire" id="deuxansexperience" value="Travailleur qualifié dans un métier qui nécessite au moins deux (2) ans de formation ou d'expérience" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="deuxansexperience"> Travailleur qualifié dans un métier qui nécessite au moins deux (2) ans de formation ou d'expérience </label>
                                     </div>
                                 </div>
                             </div>
@@ -263,35 +250,35 @@ const AjoutAdherent = () => {
                                 <h4 className=""> Situation Matrimoniale </h4>
                                 <div className="">
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Célibataire" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="statutmarital"> Célibataire </label>
+                                        <input className="form-check-input" type="radio" name="statutmarital" id="celibataire" value="Célibataire" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="celibataire"> Célibataire </label>
                                     </div>
                                     <div className="form-check">
                                         <div>
-                                            <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Marié(e)" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="statutmarital"> Marié(e) </label>
+                                            <input className="form-check-input" type="radio" name="statutmarital" id="marieenus" value="Marié(e)" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="marieenus"> Marié(e) </label>
                                         </div>
                                         <small className=""> Epoux(se) n'est pas citoyen Americain ou résident permanent légal </small>
                                     </div>
                                     <div className="form-check">
                                         <div>
-                                            <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Marié(e)-US" onChange={handleOnChange} />
-                                            <label className="form-check-label" htmlFor="statutmarital"> Marié(e) </label>
+                                            <input className="form-check-input" type="radio" name="statutmarital" id="marieeus" value="Marié(e)-US" onChange={handleOnChange} />
+                                            <label className="form-check-label" htmlFor="marieeus"> Marié(e) </label>
                                         </div>
                                         <small className=""> Epoux(se) est citoyen Americain ou résident permanent légal </small>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Divorcé(e)" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="statutmarital"> Divorcé(e) </label>
+                                        <input className="form-check-input" type="radio" name="statutmarital" id="divorce" value="Divorcé(e)" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="divorce"> Divorcé(e) </label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Veuf/Veuve" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="statutmarital"> Veuf/Veuve </label>
+                                        <input className="form-check-input" type="radio" name="statutmarital" id="veufve" value="Veuf/Veuve" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="veufve"> Veuf/Veuve </label>
                                     </div>
                                     <div className="form-check">
                                         <div>
-                                            <input className="form-check-input" type="radio" name="statutmarital" id="statutmarital" value="Séparés Légalement" onChange={handleOnChange} />
-                                        <label className="form-check-label" htmlFor="statutmarital"> Séparés Légalement </label>
+                                            <input className="form-check-input" type="radio" name="statutmarital" id="separee" value="Séparés Légalement" onChange={handleOnChange} />
+                                        <label className="form-check-label" htmlFor="separee"> Séparés Légalement </label>
                                         </div>
                                         <small className=""> La séparation légale est un arrangement lorsqu'un couple reste marié mais vit séparé, suite à une décision de justice. </small>
                                     </div>

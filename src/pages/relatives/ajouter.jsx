@@ -4,9 +4,9 @@ const AjoutRelative = () => {
   return (
     <div className="container-xl p-5">
         <div className="container-fluid">
-            <h1 class="page-title"> Nouveau Protégé </h1>
+            <h1 className="page-title"> Nouveau Protégé </h1>
             <div className="col-md-12 col-lg-12">
-                <form className="needs-validation" novalidate="" action="" method="">
+                <form>
                     <div className="row g-3">
                         <div className="col-md-5">
                             <label htmlFor="nomfamille" className="form-label"> Nom : </label>

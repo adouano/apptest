@@ -1,6 +1,13 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react';
+import {Link} from 'react-router-dom';
 
 const Administrator = () => {
+    const [loading, setLoading] = useState(true);
+
+
+    if(!loading){
+        return(<div className="container-xl p-5">Loading...</div>);
+      }else{
     return(
         <>
         <header className="bg-primary">
@@ -337,8 +344,10 @@ const Administrator = () => {
                                         <button type="submit" className="btn btn-secondary">Rechercher</button>
                                     </div>
                                 </div>
-                            </div>
-                            <button className="btn btn-primary" type="button">Ajouter Adherent</button>
+                            </div>                            
+                            <Link to={'/ajout_adherent'}>
+                                <button className="btn btn-primary" type="button">Ajouter Adherent</button>
+                            </Link> 
                         </div>
                     </div>
                 </div>
@@ -545,6 +554,7 @@ const Administrator = () => {
         </div>
         </>
     )
+}
 }
 
 export default Administrator;

@@ -1,17 +1,41 @@
 import React, { useState } from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '../config/userContext';
+import { Alert } from 'react-bootstrap';
 
 const LoginForm = () => {
 
 //   const { login } = useAuth();
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('');  
+  const [email, setEmail] = useState();
+  const [errors, setErrors] = useState();
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async(e) => {
+    console.log(email);
+    console.log(password);
+    e.preventDefault();
     // Implement login logic (e.g., call login method from AuthContext)
-    login({ username, password });
-  };
+    // login({ email, password });
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    if(email === ''){
+      setErrors("L'adresse email est obligatoire, veuillez remplir ce champ.");
+      return;
+    }
+    if(!regex.test(email)){
+      setErrors("Veuillez verifier le format email.");
+    }
+    if(password === ''){
+      setErrors('Le mot de passe ne doit pas etre vide');
+      return;
+    }
+    if(password.length < 8){
+      setErrors('Le mot de passe doit contenir 8 caracteres au moins.');
+      return;
+    }
+    
+  }
 
   return (
     <>
@@ -30,18 +54,18 @@ const LoginForm = () => {
                   </div>
                   
                   <div className="fs-6 fw-normal text-center mb-5"><h3>Connectez-vous pour commencer...</h3></div>
-                  
+                  {errors && <Alert className="alert alert-danger">{errors}</Alert>}
                   <form>
                     <div className="row gy-2 overflow-hidden">
                       <div className="col-12">
                         <div className="form-floating mb-3">
-                          <input type="email" className="form-control" name="email" id="email" placeholder="" required />
+                          <input type="email" className="form-control" onChange={(e) => setEmail(e.target.value)} id="email" placeholder="" required />
                           <label htmlFor="email" className="form-label">Adresse email</label>
                         </div>
                       </div>
                       <div className="col-12">
                         <div className="form-floating mb-3">
-                          <input type="password" className="form-control" name="password" id="password" placeholder="" required />
+                          <input type="password" className="form-control" onChange={(e) => setPassword(e.target.value)} id="password" placeholder="" required />
                           <label htmlFor="password" className="form-label">Mot de passe</label>
                         </div>
                       </div>
@@ -56,7 +80,8 @@ const LoginForm = () => {
                       </div>
                       <div className="col-12">
                         <div className="d-grid my-3">
-                          <button type="submit" className="btn btn-primary btn-lg w-100" onClick={handleLogin}>Se Connecter</button>
+                              {/* <Link to={"./dashboard"} className="btn btn-primary btn-lg w-100" onClick={handleLogin}>Se Connecter</Link> */}
+                              <button type="submit" className="btn btn-primary btn-lg w-100" onClick={handleLogin}>Se Connecter</button>
                         </div>
                       </div>
                       {/* <div className="col-12">

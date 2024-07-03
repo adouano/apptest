@@ -103,144 +103,56 @@ const Superviseur = () => {
                 </div>
             </div>
 
-            <div className="row gx-5">
-                <div className="col-xxl-4 col-md-4 mb-5">
-
-                    <div className="card card-raised">
-                        <div className="card-header">
-                            <h4 className=""> Agents Commercials </h4>
-                        </div>
-                        <div className="p-2">
-                            <div className="card-body">
-                                <svg className="bd-placeholder-img rounded-circle" width="120" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
-                                <h2 className="card-title">Card Title</h2>
-                                <p className="card-text">Card Body</p>
+                <div className="card card-raised mb-5">
+                    <div className="card-header bg-transparent px-4">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div className="me-4">
+                                <h2 className="card-title mb-0">List de partenaires</h2>
+                                <div className="card-subtitle">Details and history</div>
                             </div>
-                            <div className="card-actions">
-                                <div className="d-flex gap-3">
-                                    <button className="btn btn-primary" type="button">Read</button>
-                                    <button className="btn btn-dark" type="button">Bookmark</button>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="my-2" />
-                        <div className="p-2">
-                            <div className="card-body">
-                                <svg className="bd-placeholder-img rounded-circle" width="120" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
-                                <h2 className="card-title">Card Title</h2>
-                                <p className="card-text">Card Body</p>
-                            </div>
-                            <div className="card-actions">
-                                <div className="d-flex gap-3">
-                                    <button className="btn btn-primary" type="button">Read</button>
-                                    <button className="btn btn-dark" type="button">Bookmark</button>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="my-2" />
-                        <div className="p-2">
-                            <div className="card-body">
-                                <svg className="bd-placeholder-img rounded-circle" width="120" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
-                                <h2 className="card-title">Card Title</h2>
-                                <p className="card-text">Card Body</p>
-                            </div>
-                            <div className="card-actions">
-                                <div className="d-flex gap-3">
-                                    <button className="btn btn-primary" type="button">Read</button>
-                                    <button className="btn btn-dark" type="button">Bookmark</button>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="my-2" />
-                        <div className="p-2">
-                            <div className="card-body">
-                                <svg className="bd-placeholder-img rounded-circle" width="120" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
-                                <h2 className="card-title">Card Title</h2>
-                                <p className="card-text">Card Body</p>
-                            </div>
-                            <div className="card-actions">
-                                <div className="d-flex gap-3">
-                                    <button className="btn btn-primary" type="button">Read</button>
-                                    <button className="btn btn-dark" type="button">Bookmark</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-xxl-8 col-lg-8 col-md-8 mb-5">
-                    <div className="card mb-5">
-                        <div className="card-header border-0">
-                            <div className="d-flex justify-content-between">
-                                <h3 className="card-title">Sales</h3>
-                                <a href="#">View Report</a>
-                            </div>
-                        </div>
-                        <div className="card-body">
-                            <div className="d-flex">
-                                <p className="d-flex flex-column">
-                                    <span className="text-bold text-lg">$18,230.00</span>
-                                    <span>Sales Over Time</span>
-                                </p>
-                                <p className="ml-auto d-flex flex-column text-right">
-                                    <span className="text-success"><i className="fas fa-arrow-up"></i> 33.1%</span>
-                                    <span className="text-muted">Since last month</span>
-                                </p>
-                            </div>
-                            <div className="position-relative mb-4">
-                                <div className="chartjs-size-monitor">
-                                    <div className="chartjs-size-monitor-expand">
-                                        <div className=""></div>
-                                    </div>
-                                    <div className="chartjs-size-monitor-shrink">
-                                        <div className=""></div>
+                            <div className="d-flex gap-5">
+                                <div className="card-tools">
+                                    <div className="input-group input-group-sm">
+                                        <input type="text" name="table_search" className="form-control float-right" placeholder="Recherche" />
+                                        <div className="input-group-append">
+                                            <button type="submit" className="btn btn-secondary">Rechercher</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <canvas id="sales-chart" height="400" width="1014" className="chartjs-render-monitor"></canvas>
-                            </div>
-                            <div className="d-flex flex-row justify-content-end">
-                                <span className="mr-2"><i className="fas fa-square text-primary"></i> This year</span>
-                                <span><i className="fas fa-square text-gray"></i> Last year</span>
+                                <button className="btn btn-primary" type="button">Ajouter Partenaire</button>
                             </div>
                         </div>
                     </div>
-
-                    <div className="card">
-                        <div className="card-header border-0">
-                            <h3 className="card-title">Online Store Overview</h3>
-                            <div className="card-tools">
-                                <a href="#" className="btn btn-sm btn-tool"><i className="fas fa-download"></i></a>
-                                <a href="#" className="btn btn-sm btn-tool"><i className="fas fa-bars"></i></a>
-                            </div>
-                        </div>
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center border-bottom mb-3">
-                                <p className="text-success text-xl"><i className="ion ion-ios-refresh-empty"></i></p>
-                                <p className="d-flex flex-column text-right">
-                                    <span className="font-weight-bold"><i className="ion ion-android-arrow-up text-success"></i> 12%</span>
-                                    <span className="text-muted">CONVERSION RATE</span>
-                                </p>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center border-bottom mb-3">
-                                <p className="text-warning text-xl"><i className="ion ion-ios-cart-outline"></i></p>
-                                <p className="d-flex flex-column text-right">
-                                    <span className="font-weight-bold"><i className="ion ion-android-arrow-up text-warning"></i> 0.8%</span>
-                                    <span className="text-muted">SALES RATE</span>
-                                </p>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center mb-0">
-                                <p className="text-danger text-xl"><i className="ion ion-ios-people-outline"></i></p>
-                                <p className="d-flex flex-column text-right">
-                                    <span className="font-weight-bold"><i className="ion ion-android-arrow-down text-danger"></i> 1%</span>
-                                    <span className="text-muted">REGISTRATION RATE</span>
-                                </p>
-                            </div>
-
-                        </div>
-                    </div>
+                
+                    <table className="table table-hover">
+                        <thead className="">
+                            <tr>
+                                <th scope="col"> Ordre </th>
+                                <th scope="col"> Nom </th>
+                                <th scope="col"> Prenoms </th>
+                                <th scope="col"> Groupe de travail </th>
+                                <th scope="col"> Ville </th>
+                                <th scope="col"> Contact </th>
+                                <th scope="col"> Actions </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>Commercial</td>
+                                <td> Bouake </td>
+                                <td> 09873435456 </td>
+                                <td className="d-flex gap-2">
+                                    <a type="button" className="btn btn-success bg-gradient" href="details-adherent.html">Infos</a>
+                                    <a type="button" className="btn btn-warning bg-gradient" href="">Modifier</a>
+                                    <a type="button" className="btn btn-danger bg-gradient" href="">Supprimer</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-            </div>
 
             <div className="card card-raised">
                 <div className="card-header bg-transparent px-4">
@@ -265,16 +177,16 @@ const Superviseur = () => {
                 
                 <table className="table table-hover">
                     <thead className="">
-                    <tr>
-                        <th scope="col"> Ordre </th>
-                        <th scope="col"> Nom </th>
-                        <th scope="col"> Prenoms </th>
-                        <th scope="col"> Sexe </th>
-                        <th scope="col"> Ville </th>
-                        <th scope="col"> Nationalité </th>
-                        <th scope="col"> Contact </th>
-                        <th scope="col"> Actions </th>
-                    </tr>
+                        <tr>
+                            <th scope="col"> Ordre </th>
+                            <th scope="col"> Nom </th>
+                            <th scope="col"> Prenoms </th>
+                            <th scope="col"> Sexe </th>
+                            <th scope="col"> Ville </th>
+                            <th scope="col"> Nationalité </th>
+                            <th scope="col"> Contact </th>
+                            <th scope="col"> Actions </th>
+                        </tr>
                     </thead>
                     <tbody>
                     <tr>
@@ -463,7 +375,7 @@ const Superviseur = () => {
                 </nav>
             </div>
         </div>
-        </>
+    </>
     )
 }
 
