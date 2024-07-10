@@ -1,32 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import supabase from '../config/dbConfig';
 import {Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '../config/userContext';
 import { Alert } from 'react-bootstrap';
+import Dashboard from './dashboard';
 
 const LoginForm = () => {
-
-//   const { login } = useAuth();
-  const [username, setUsername] = useState('');
+  const { login, user } = useAuth();
   const [password, setPassword] = useState('');  
-  const [email, setEmail] = useState();
-  const [errors, setErrors] = useState();
+  const [email, setEmail] = useState(null);
+  const [errors, setErrors] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = async(e) => {
-    console.log(email);
-    console.log(password);
     e.preventDefault();
     // Implement login logic (e.g., call login method from AuthContext)
     // login({ email, password });
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-    if(email === ''){
+    if(!email){
       setErrors("L'adresse email est obligatoire, veuillez remplir ce champ.");
       return;
     }
     if(!regex.test(email)){
       setErrors("Veuillez verifier le format email.");
     }
-    if(password === ''){
+    if(!password){
       setErrors('Le mot de passe ne doit pas etre vide');
       return;
     }
@@ -34,8 +32,19 @@ const LoginForm = () => {
       setErrors('Le mot de passe doit contenir 8 caracteres au moins.');
       return;
     }
-    
+
+    try{
+      await login(email, password);
+
+      setErrors("");
+      // navigate(userPermission);
+      navigate('dashboard');
+    }
+    catch(error){
+      setErrors(error.message);
+    }
   }
+
 
   return (
     <>
@@ -59,7 +68,7 @@ const LoginForm = () => {
                     <div className="row gy-2 overflow-hidden">
                       <div className="col-12">
                         <div className="form-floating mb-3">
-                          <input type="email" className="form-control" onChange={(e) => setEmail(e.target.value)} id="email" placeholder="" required />
+                          <input type="email" className="form-control" onChange={(e) => setEmail(e.target.value)} id="email" placeholder="" autoComplete="off" required />
                           <label htmlFor="email" className="form-label">Adresse email</label>
                         </div>
                       </div>

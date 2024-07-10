@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import ModalInfoAgent from './modal_agent';
 
 const Superviseur = () => {
     return(
@@ -21,7 +22,7 @@ const Superviseur = () => {
 
         <div className="container-xl p-5">
             <div className="row gx-5">
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-primary border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -41,7 +42,7 @@ const Superviseur = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-warning border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -61,7 +62,7 @@ const Superviseur = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-secondary border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -81,7 +82,7 @@ const Superviseur = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-info border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -145,9 +146,8 @@ const Superviseur = () => {
                                 <td> Bouake </td>
                                 <td> 09873435456 </td>
                                 <td className="d-flex gap-2">
-                                    <a type="button" className="btn btn-success bg-gradient" href="details-adherent.html">Infos</a>
-                                    <a type="button" className="btn btn-warning bg-gradient" href="">Modifier</a>
-                                    <a type="button" className="btn btn-danger bg-gradient" href="">Supprimer</a>
+                                    <ModalInfoAgent />
+                                    <a type="button" className="btn btn-danger bg-gradient" href="#!">Activer/Desactiver</a>
                                 </td>
                             </tr>
                         </tbody>

@@ -1,8 +1,9 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import {Link} from 'react-router-dom';
+import supabase from "../config/dbConfig";
 
-const Commercial = () => {
+    const Commercial = () => {
     return(
         <>
         <header className="bg-primary">
