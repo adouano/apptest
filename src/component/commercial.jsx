@@ -1,16 +1,74 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import supabase from "../config/dbConfig";
 import { Button } from "react-bootstrap";
 import {Link} from 'react-router-dom';
-import supabase from "../config/dbConfig";
 
-    const Commercial = () => {
+const Commercial = ({profile}) => {
+    const [fetchData, setFetchData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(null);
+
+    useEffect(() => {
+        const fetchPersons= async () => {
+          try{
+            const {data,error} = await supabase.from('dvenrollment').select();
+    
+            if(error){
+              throw new Error("Could not fetch data.");
+            }
+            setFetchData(data);
+            setFetchError(null);
+            setLoading(false);
+          }
+          catch(error){
+            setFetchError(error.message);
+            setFetchData(null);
+          }
+        };
+        fetchPersons();
+    }, []);
+
+
+    // const deleteItem = async (itemId) => {
+    //     try{
+    //       const {error} = await supabase.from('items').delete().eq('id', itemId);
+          
+    //       if(error){
+    //         throw new Error("Something went wrong when deleting ...");
+    //       }
+    //       // Alert(`Are you sure to delete this item: ${item.item_name}`);
+    //       setFetchData(fetchData.filter((item) => item.id !== itemId));
+    //     }
+    //     catch(error){
+    //       console.log("Error: ", error);
+    //     }
+    // }
+    
+    // const handleSearch = (e) => {
+    //     setSearch(e.target.value);
+    // }
+
+    // let searchFilter = fetchData;
+    // if(search){
+    //     searchFilter = fetchData.filter((itemData) => {
+    //         const itemName = itemData.item_name.toLowerCase().includes(search.toLowerCase());
+    //         const itemDesc = itemData.description.toLowerCase().includes(search.toLowerCase());
+    //         const itemCondition = itemData.item_condition.toLowerCase().includes(search.toLowerCase());
+    //         const itemCategory = itemData.categories.name.toLowerCase().includes(search.toLowerCase());
+    //         return itemName || itemDesc || itemCondition || itemCategory;
+    //     });
+    // } 
+
+    if(loading){
+        return(<div className="">Loading...</div>);
+      }else{
     return(
         <>
         <header className="bg-primary">
             <div className="container-xl p-5">
                 <div className="row align-items-center justify-content-between">
                     <div className="col-12 col-md mb-4 mb-md-0">
-                        <h1 className="mb-1 display-4 fw-500 text-white">Welcome back, Robert!</h1>
+                        <h1 className="mb-1 display-4 fw-500 text-white">Welcome back, {profile.prenoms}!</h1>
                         <p className="lead mb-0 text-white">Your dashboard is ready to go!</p>
                     </div>
                     {/* <div className="col-12 col-md-auto flex-shrink-0">
@@ -143,24 +201,29 @@ import supabase from "../config/dbConfig";
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>H</td>
-                        <td> Bouake </td>
-                        <td> Ivoirienne </td>
-                        <td> 09873435456 </td>
-                        <td className="d-flex gap-2">
-                            <Link to={'/info_adherent'}>
-                                <button className="btn btn-success bg-gradient">Infos</button>
-                            </Link>
-                            <Link to={'/edit_adherent'}>
-                                <button className="btn btn-warning bg-gradient">Modifier</button>
-                            </Link>
-                            <a type="button" className="btn btn-danger bg-gradient" href="">Supprimer</a>
-                        </td>
-                    </tr>
+                    {fetchData.map((person) => (
+                        <tr key={person.id}>
+                            <th scope="row">{person.id}</th>
+                            <td>{person.nomdefamille}</td>
+                            <td>{person.prenomdefamille}</td>
+                            <td>{person.genresexe}</td>
+                            <td> {person.villederesidence} </td>
+                            <td> {person.paysdenaissance} </td>
+                            <td> {person.telephoneprimaire} </td>
+                            <td className="d-flex gap-2">
+                                <Link to={`/info_adherent/${person.id}`}>
+                                    <button className="btn btn-success bg-gradient">Infos</button>
+                                </Link>
+                                <Link to={'/edit_adherent'}>
+                                    <button className="btn btn-warning bg-gradient">Modifier</button>
+                                </Link>
+                                <a type="button" className="btn btn-danger bg-gradient" href="">Supprimer</a>
+                            </td>
+                        </tr>
+                    ))}
+
+
+
                     <tr>
                         <th scope="row">2</th>
                         <td>Jacob</td>
@@ -315,6 +378,9 @@ import supabase from "../config/dbConfig";
                             <a type="button" className="btn btn-danger" href="">Supprimer</a>
                         </td>
                     </tr>
+
+
+
                     </tbody>
                 </table>
 
@@ -334,7 +400,8 @@ import supabase from "../config/dbConfig";
             </div>
         </div>
         </>
-    )
+        )
+    }
 }
 
 export default Commercial;

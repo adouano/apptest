@@ -31,27 +31,26 @@ function App() {
   return (
           <AuthProvider>
             {/* <Header /> */}
-              <Routes>
-                
-                <Route index element={<LoginForm />} />
-                <Route path="inscription" element={<AccountCreation />} />
-                
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route ProtectedRoute path="admin" element={<Administrator />} roles={['admin']} />
-                <Route ProtectedRoute path="superviseur" element={<Superviseur />} roles={['supervisor']} />
-                <Route ProtectedRoute path="finance" element={<Caissiere />} roles={['finance']} />
-                <Route ProtectedRoute path="agent" element={<Commercial />} roles={['agent']} />
-                <Route path="ajout_adherent" element={<AjoutAdherent />} />
-                <Route path="info_adherent" element={<InfoAdherent />} />
-                <Route path="edit_adherent" element={<EditAdherent />} />
-                <Route path="ajout_relative" element={<AjoutRelative />} />
-                <Route path="info_relative" element={<InfoRelative />} />
-                <Route path="edit_relative" element={<EditRelative />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="configuration" element={<Configuration />} />
-                <Route path="./reg_success" element={<RegistrationSuccess />} />
-                <Route path="*" element={<ErrorPage />} />
-              </Routes>
+            <Routes>                
+              <Route index element={<LoginForm />} />
+              <Route path="inscription" element={<AccountCreation />} />
+
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route ProtectedRoute path="admin" element={<Administrator />} roles={['admin']} />
+              <Route ProtectedRoute path="superviseur" element={<Superviseur />} roles={['supervisor']} />
+              <Route ProtectedRoute path="finance" element={<Caissiere />} roles={['finance']} />
+              <Route ProtectedRoute path="agent" element={<Commercial />} roles={['agent']} />
+              <Route path="ajout_adherent" element={<AjoutAdherent />} />
+              <Route path="info_adherent/:personId" element={<InfoAdherent />} />
+              <Route path="edit_adherent" element={<EditAdherent />} />
+              <Route path="ajout_relative" element={<AjoutRelative />} />
+              <Route path="info_relative" element={<InfoRelative />} />
+              <Route path="edit_relative" element={<EditRelative />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="configuration" element={<Configuration />} />
+              <Route path="./reg_success" element={<RegistrationSuccess />} />
+              <Route path="*" element={<ErrorPage />} />
+            </Routes>
             {/* <Footer /> */}
           </AuthProvider>
         );

@@ -9,31 +9,52 @@ const Configuration = () => {
 
         <h3 className=''>Montant Adherent</h3>
         <Stack direction="horizontal" gap={3} className='pb-5'>
-            <Form.Control className="me-auto" placeholder="Add your item here..." />
+            <Form.Control className="me-auto" placeholder="Somme a payer pour l'adherent principal..." />
             <Button variant="secondary">Enregistrer</Button>
             <div className="vr" />
             <Button variant="outline-danger">Reinitialiser</Button>
         </Stack>
+
         <hr/>
         <h3 className='mt-5'>Montant Relative</h3>
         <Stack direction="horizontal" gap={3} className='pb-5'>
-            <Form.Control className="me-auto" placeholder="Add your item here..." />
+            <Form.Control className="me-auto" placeholder="Somme a payer par protege ajoute..." />
             <Button variant="secondary">Enregistrer</Button>
             <div className="vr" />
             <Button variant="outline-danger">Reinitialiser</Button>
         </Stack>
+
         <hr/>
-        <h3 className='mt-5'>Commision/Pourcentage commercial</h3>
+        <h3 className='mt-5'>Commision/Pourcentage Commercial</h3>
         <Stack direction="horizontal" gap={3} className='pb-5'>
-            <Form.Control className="me-auto" placeholder="Add your item here..." />
+            <Form.Control className="me-auto" placeholder="Commision/Pourcentage..." />
             <Button variant="secondary">Enregistrer</Button>
             <div className="vr" />
             <Button variant="outline-danger">Reinitialiser</Button>
         </Stack>
+
+        <hr/>
+        <h3 className='mt-5'>Commision/Pourcentage Caissiere</h3>
+        <Stack direction="horizontal" gap={3} className='pb-5'>
+            <Form.Control className="me-auto" placeholder="Commision/Pourcentage..." />
+            <Button variant="secondary">Enregistrer</Button>
+            <div className="vr" />
+            <Button variant="outline-danger">Reinitialiser</Button>
+        </Stack>
+
+        <hr/>
+        <h3 className='mt-5'>Commision/Pourcentage Informaticien</h3>
+        <Stack direction="horizontal" gap={3} className='pb-5'>
+            <Form.Control className="me-auto" placeholder="Commision/Pourcentage..." />
+            <Button variant="secondary">Enregistrer</Button>
+            <div className="vr" />
+            <Button variant="outline-danger">Reinitialiser</Button>
+        </Stack>
+
         <hr/>
         <h3 className='mt-5'>Ajout de location/ville</h3>
         <Stack direction="horizontal" gap={3} className='pb-5'>
-            <Form.Control className="me-auto" placeholder="Add your item here..." />
+            <Form.Control className="me-auto" placeholder="Ajout de nouveaux lieu/bureau de mission..." />
             <Button variant="secondary">Enregistrer</Button>
             <div className="vr" />
             <Button variant="outline-danger">Reinitialiser</Button>

@@ -1,57 +1,88 @@
-import React from 'react'
-import {Link} from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import supabase from "../../config/dbConfig";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import Versements from '../../component/versements';
 
 const InfoAdherent = () => {
+  const {personId} = useParams();
+  const [fetchData, setFetchData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(null);
+
+    useEffect(() => {
+        const fetchPersons= async () => {
+          try{
+            const {data,error} = await supabase.from('dvenrollment').select().eq('id', personId).single();
+    
+            if(error){
+              throw new Error("Could not fetch data.");
+            }
+            setFetchData(data);
+            setFetchError(null);
+            setLoading(false);
+          }
+          catch(error){
+            setFetchError(error.message);
+            setFetchData(null);
+          }
+        };
+        fetchPersons();
+    }, []);
+
+    console.log(fetchData);
+
   return (
     <>
     <div className="container-xl p-5">
         <div className="row">
             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <div className="panel panel-info">
-                    <div className="panel-heading">
-                        <h3 className="panel-title"> Yao Kouacou Norbert </h3>
-                    </div>
-                    <div className="panel-body">
-                        <div className="row">
-                            <div className="col-md-3 col-lg-3 " align="center"> 
-                                <img alt="Profile Adherent" src="https://cdn.aaihs.org/2016/04/6717549.jpg" className="img-circle img-responsive" />
-                            </div>
-                            <div className="col-md-9 col-lg-9"> 
-                                <table className="table table-user-information">
-                                    <tbody>
-                                        <>
-                                        <tr>
-                                            <td>Pays : </td>
-                                            <td>Cote d'Ivoire</td>
-                                        </tr>
-                                        <tr>
-                                            <td> Date de Naissance : </td>
-                                            <td> 25/04/1988 </td>
-                                        </tr>                            
-                                        <tr>
-                                            <td> Genre : </td>
-                                            <td> Homme </td>
-                                        </tr>
-                                        <tr>
-                                            <td> Adresse : </td>
-                                            <td> Dioulabougou, Daloa </td>
-                                        </tr>
-                                        <tr>
-                                            <td> Email : </td>
-                                            <td><a href="mailto:yaonorber@gmail.com"> yaonorber@gmail.com </a></td>
-                                        </tr>
-                                        <tr>
-                                            <td> Contact telephonique :</td>
-                                            <td> 123-4567-890(Landline)<br/>555-4567-890(Mobile)</td>                                    
-                                        </tr>
-                                        </>
-                                    </tbody>
-                                </table>
+                {/* {fetchData.map((person) => ( */}
+                    <div className="panel panel-info" key={fetchData.id}>
+                        <div className="panel-heading">
+                            <h3 className="panel-title"> {fetchData.nomdefamille} {fetchData.prenomdefamille} </h3>
+                        </div>
+                        <div className="panel-body">
+                            <div className="row">
+                                <div className="col-md-3 col-lg-3 " align="center"> 
+                                    <img alt="Profile Adherent" src="https://cdn.aaihs.org/2016/04/6717549.jpg" className="img-circle img-responsive" />
+                                </div>
+                                <div className="col-md-9 col-lg-9"> 
+                                    <table className="table table-user-information">
+                                        <tbody>
+                                            <>
+                                            <tr>
+                                                <td>Pays : </td>
+                                                <td> {fetchData.paysdenaissance} </td>
+                                            </tr>
+                                            <tr>
+                                                <td> Date de Naissance : </td>
+                                                <td> {fetchData.datedenaissance} </td>
+                                            </tr>                            
+                                            <tr>
+                                                <td> Genre : </td>
+                                                <td>  {fetchData.genresexe}  </td>
+                                            </tr>
+                                            <tr>
+                                                <td> Adresse : </td>
+                                                <td> {fetchData.adressepostal} </td>
+                                            </tr>
+                                            <tr>
+                                                <td> Email : </td>
+                                                <td><a href={fetchData.adresseemail} > {fetchData.adresseemail}  </a></td>
+                                            </tr>
+                                            <tr>
+                                                <td> Contact telephonique :</td>
+                                                <td> {fetchData.telephoneprimaire}(Landline)<br/>{fetchData.telephonesecondaire}(Mobile)</td>                                    
+                                            </tr>
+                                            </>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                {/* ))} */}
+
                 <div className="panel-footer footer-content">
                     <button data-original-title="Broadcast Message" data-toggle="tooltip" type="button" className="btn btn-sm btn-primary"><i className="bi bi-envelope-arrow-up-fill"></i></button>
                     <span className="pull-right">

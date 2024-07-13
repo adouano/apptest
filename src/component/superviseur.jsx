@@ -1,14 +1,14 @@
 import React from 'react';
 import ModalInfoAgent from './modal_agent';
 
-const Superviseur = () => {
+const Superviseur = ({profile}) => {
     return(
         <>
         <header className="bg-primary">
             <div className="container-xl p-5">
                 <div className="row align-items-center justify-content-between">
                     <div className="col-12 col-md mb-4 mb-md-0">
-                        <h1 className="mb-1 display-4 fw-500 text-white">Welcome back, Robert!</h1>
+                        <h1 className="mb-1 display-4 fw-500 text-white">Welcome back, {profile.prenoms}!</h1>
                         <p className="lead mb-0 text-white">Your dashboard is ready to go!</p>
                     </div>
                     {/* <div className="col-12 col-md-auto flex-shrink-0">

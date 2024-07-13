@@ -18,7 +18,7 @@ const Dashboard = () => {
   // const {permission} = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [profiles, setProfiles] = useState([]);
+  const [profile, setProfile] = useState();
   const [loading, setLoading] = useState(true);
   const [userPermission, setUserPermission] = useState('');
   let userId = user?.id;
@@ -26,53 +26,41 @@ const Dashboard = () => {
   useEffect(() => {
     const userProfile = async () => {
       try{
-        // const { data, error } = await supabase.from('associates').select().eq('associate_id', userId);
-        const { data, error } = await supabase.from('associates').select();
+        const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+        // const { data, error } = await supabase.from('associates').select();
 
         if(error){
-          throw new Error("Could not fetch.");
+          throw new Error(error.message);
         }
-        setProfiles(data); 
+        setProfile(data); 
+        setLoading(false);
       }
       catch(error){
         console.log("Error: ", error);
       }
     }
     userProfile();
-  }, []);
+  }, [userId]);
 
-
-  // let currentUser;
-  let permission;
-  profiles?.map((profile) => {
-    if(user?.id === profile.associate_id){
-      // currentUser = profile;
-      permission = profile.role;
-    }
-  });
-  console.log(permission);
-  console.log(profiles);
-
-  if(!loading){
+  if(loading){
       return(<div className="container-xl p-5">Loading...</div>);
     }else{
       return (
-        !user?.id ? (
-          !permission && <LoginForm />
+        !profile?.associate_id ? (
+          <>
+            {/* <LoginForm /> */}
+            {!profile.role && <LoginForm />}
+          </>
         ):(
-        <>
-          <Header />
-          {profiles?.map((profile) => (
-            <>
-              permission === "admin" && <Administrator key={profile.associate_id} profile={profile} />
-              permission === "superviseur" && <Superviseur key={profile.associate_id} />
-              permission === "finance" && <Caissiere key={profile.associate_id} />
-              permission === "agent" && <Commercial key={profile.associate_id} />
-              permission === "informatic" && <Informaticien key={profile.associate_id} />
-            </>
-          ))}
-          <Footer />
-        </>
+          <>
+            <Header />
+              {profile.role === "admin" && <Administrator key={profile.associate_id} profile={profile} />}
+              {profile.role === "superviseur" && <Superviseur key={profile.associate_id} profile={profile} />}
+              {profile.role === "finance" && <Caissiere key={profile.associate_id} profile={profile} />}
+              {profile.role === "agent" && <Commercial key={profile.associate_id} profile={profile} />}
+              {profile.role === "informatic" && <Informaticien key={profile.associate_id} profile={profile} />}
+            <Footer />
+          </>
         )
       )
     }

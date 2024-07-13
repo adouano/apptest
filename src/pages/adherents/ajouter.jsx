@@ -1,7 +1,12 @@
 import React, {useState, useEffect} from 'react';
+import supabase from '../../config/dbConfig';
+import { useAuth }  from '../../config/userContext';
+import {Link, useNavigate} from 'react-router-dom';
 import { Alert } from 'react-bootstrap';
 
 const AjoutAdherent = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         numdvlottery:"",
         numdossier:"",
@@ -29,11 +34,12 @@ const AjoutAdherent = () => {
     const [numDossier, setNumDossier] = useState(0);
     useEffect(() => {
         const NumDossierAleatoire = () => {
-            return Math.floor(Math.random() * (99999 - 1 + 1)) + 1;
+            return Math.floor(Math.random() * (99990 - 1 + 1)) + 1;
         }
         setNumDossier(NumDossierAleatoire());
     }, []);
     const enrolDossier = new Date().getFullYear()+'GC'+numDossier;
+    // const enrolDossier = new Date().getFullYear()+'GC'+Math.floor(Math.random() (99999 - 1 + 1)) + 1;
 
     const handleOnChange = (e) => {
         const {name,value,files} = e.target;
@@ -43,28 +49,66 @@ const AjoutAdherent = () => {
         }
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         console.log(formData);
-        console.dir(enrolDossier);
+        // console.dir(enrolDossier);
         e.preventDefault(); 
-        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         // const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
         // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
         // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_+-=[]{};':"|\\,.<>/?]).{8,}$/i;
 
-        if(!formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.photo || !formData.niveauscolaire || !formData.statutmarital){
-            setFormError("Tous les champs sont obligatoires.");
-            return;
+        // if(!formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.niveauscolaire || !formData.statutmarital){
+        //     setFormError("Tous les champs sont obligatoires.");
+        //     return;
+        // }
+    //     if(!emailRegex.test(formData.email)){
+    //         setFormError("Erreur de format email.");
+    //         return;
+    //     }
+    //     // if(phoneRegex.test(formData.telephone)){
+    //     if(!(formData.telephone.match('[0-9]{10}')) ){
+    //         setFormError("Le numero de telephone doit contenir 10 caracteres.");
+    //         return;
+    //    }
+
+       try{
+        const { data, error } = await supabase
+        .from('dvenrollment')
+        .insert({
+            agent_id:user?.id,
+            numerodvlottery:null,
+            numerodossier:enrolDossier,
+            nomdefamille:formData.nomfamille,
+            prenomdefamille:formData.prenomfamille,
+            datedenaissance:formData.datenaissance,
+            lieudenaissance:formData.lieunaissance,
+            genresexe:formData.genre,
+            paysdenaissance:formData.pays,
+            adresseemail:formData.email,
+            adressepostal:formData.adresse,
+            paysderesidence:formData.paysresidence,
+            villederesidence:formData.villeresidence,
+            quartierderesidence:formData.quartier,
+            telephoneprimaire:formData.telephone,
+            telephonesecondaire:formData.telephone1,
+            photoidentite:formData.photo,
+            niveauscolaire:formData.niveauscolaire,
+            etatmatrimoniale:formData.statutmarital,
+            nombredeprotege:formData.nombrelative
+        })
+        .select();
+
+        console.log(data);
+        console.log(user?.id);
+  
+        if(!error){
+            setFormError(null);
+            navigate('../dashboard');
         }
-        if(!emailRegex.test(formData.email)){
-            setFormError("Erreur de format email.");
-            return;
-        }
-        // if(phoneRegex.test(formData.telephone)){
-        if(!(formData.telephone.match('[0-9]{10}')) ){
-            setFormError("Le numero de telephone doit contenir 10 caracteres.");
-            return;
-       }
+      }catch (error){
+        setFormError(error.message);
+      }
 
     }
 
@@ -142,7 +186,7 @@ const AjoutAdherent = () => {
                                 <label htmlFor="email" className="form-label">Email <span className="text-body-secondary"></span></label>
                                 <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} autoComplete="off" />
                                 <div className="invalid-feedback">L'adresse e-mail est obligatoire.</div>
-                                {/* {formError.email && <p>Ajouter une adresse email valide</p>} */}
+                                {/*{formError.email && <p>Ajouter une adresse email valide</p>} */}
                             </div>
                 
                             <div className="col-md-12">
