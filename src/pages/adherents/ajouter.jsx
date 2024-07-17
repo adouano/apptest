@@ -4,8 +4,11 @@ import { useAuth }  from '../../config/userContext';
 import {Link, useNavigate} from 'react-router-dom';
 import { Alert } from 'react-bootstrap';
 
+import Footer from '/src/footer';
+import Header from '/src/header';
+
 const AjoutAdherent = () => {
-    const { user } = useAuth();
+    const { user, handleGoBack } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         numdvlottery:"",
@@ -54,23 +57,23 @@ const AjoutAdherent = () => {
         // console.dir(enrolDossier);
         e.preventDefault(); 
         // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-        // const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
-        // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+        const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
         // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_+-=[]{};':"|\\,.<>/?]).{8,}$/i;
 
-        // if(!formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.niveauscolaire || !formData.statutmarital){
-        //     setFormError("Tous les champs sont obligatoires.");
-        //     return;
-        // }
-    //     if(!emailRegex.test(formData.email)){
-    //         setFormError("Erreur de format email.");
-    //         return;
-    //     }
-    //     // if(phoneRegex.test(formData.telephone)){
-    //     if(!(formData.telephone.match('[0-9]{10}')) ){
-    //         setFormError("Le numero de telephone doit contenir 10 caracteres.");
-    //         return;
-    //    }
+        if(!formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.niveauscolaire || !formData.statutmarital){
+            setFormError("Tous les champs sont obligatoires.");
+            return;
+        }
+        if(!emailRegex.test(formData.email)){
+            setFormError("Erreur de format email.");
+            return;
+        }
+        // if(phoneRegex.test(formData.telephone)){
+        if(!(formData.telephone.match('[0-9]{10}')) ){
+            setFormError("Le numero de telephone doit contenir 10 caracteres.");
+            return;
+       }
 
        try{
         const { data, error } = await supabase
@@ -104,7 +107,7 @@ const AjoutAdherent = () => {
   
         if(!error){
             setFormError(null);
-            navigate('../dashboard');
+            navigate('/');
         }
       }catch (error){
         setFormError(error.message);
@@ -115,10 +118,12 @@ const AjoutAdherent = () => {
 
   return (
     <>
+    <Header />
         <div className="container-xl p-5">
             <div className="container-fluid">
             <h1 className="page-title"> Nouveau Adhérent  </h1>
-                <div className="col-md-12 col-lg-12">
+            <button onClick={handleGoBack}>Go Back</button>
+            <div className="col-md-12 col-lg-12">
 
                 {formError && <Alert className="alert alert-danger">{formError}</Alert>}
                     <form onSubmit={handleSubmit}>
@@ -342,6 +347,7 @@ const AjoutAdherent = () => {
                 </div>
             </div>
         </div>
+    <Footer />
     </>
   )
 }

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {useNavigate, Routes, Route, Link} from 'react-router-dom';
 import { AuthProvider } from './config/userContext';
 import ProtectedRoute from './config/ProtectedRoute';
+import { useAuth } from './config/userContext';
 
 // import './App.css';
 import LoginForm from './component/login';
@@ -26,38 +27,41 @@ import RegistrationSuccess from './component/reg_success';
 
 
 function App() {
-  const [user, setUser] = useState(null);
+  // const { user } = useAuth();
+  const navigate = useNavigate();
 
+  // console.log(user);
+ 
   return (
-          <AuthProvider>
-            {/* <Header /> */}
-            <Routes>                
-              <Route index element={<LoginForm />} />
-              <Route path="inscription" element={<AccountCreation />} />
-
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route ProtectedRoute path="admin" element={<Administrator />} roles={['admin']} />
-              <Route ProtectedRoute path="superviseur" element={<Superviseur />} roles={['supervisor']} />
-              <Route ProtectedRoute path="finance" element={<Caissiere />} roles={['finance']} />
-              <Route ProtectedRoute path="agent" element={<Commercial />} roles={['agent']} />
-              <Route path="ajout_adherent" element={<AjoutAdherent />} />
-              <Route path="info_adherent/:personId" element={<InfoAdherent />} />
-              <Route path="edit_adherent" element={<EditAdherent />} />
-              <Route path="ajout_relative" element={<AjoutRelative />} />
-              <Route path="info_relative" element={<InfoRelative />} />
-              <Route path="edit_relative" element={<EditRelative />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="configuration" element={<Configuration />} />
-              <Route path="./reg_success" element={<RegistrationSuccess />} />
-              <Route path="*" element={<ErrorPage />} />
-            </Routes>
-            {/* <Footer /> */}
-          </AuthProvider>
-        );
+    
+    <AuthProvider>
+      {/* <Header /> */}
+      <Routes>                
+        <Route path="connexion" element={<LoginForm />} />
+        <Route path="inscription" element={<AccountCreation />} />
+        <Route index element={<Dashboard />} />
+        <Route ProtectedRoute path="admin" element={<Administrator />} roles={['admin']} />
+        <Route ProtectedRoute path="superviseur" element={<Superviseur />} roles={['supervisor']} />
+        <Route ProtectedRoute path="finance" element={<Caissiere />} roles={['finance']} />
+        <Route ProtectedRoute path="agent" element={<Commercial />} roles={['agent']} />
+        <Route path="adherent/ajouter" element={<AjoutAdherent />} />
+        <Route path="adherent/:personId/info" element={<InfoAdherent />} />
+        <Route path="adherent/:personId/modifier" element={<EditAdherent />} />
+        <Route path="relative/ajouter" element={<AjoutRelative />} />
+        <Route path="relative/:personId/info" element={<InfoRelative />} />
+        <Route path="relative/:personId/modifier" element={<EditRelative />} />
+        <Route path=":userId/profile" element={<Profile />} />
+        <Route path="configuration" element={<Configuration />} />
+        <Route path="reg_success" element={<RegistrationSuccess />} />
+        <Route path="*" element={<ErrorPage />} />
+      </Routes>
+      {/* <Footer /> */}
+    </AuthProvider>
+  );
 
   // return (
   //   <AuthProvider>
-  //     {user === null ? <Login /> : <Home user={user} />}
+  //     {user === null ? <Login /> : <Dashboard user={user} />}
   //   </AuthProvider>
   // );
 }

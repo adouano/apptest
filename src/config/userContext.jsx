@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);  
+  const [isLoggedIn, setisLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   const register = (email, password) => {
@@ -22,13 +23,13 @@ export const AuthProvider = ({ children }) => {
       password: password
     });
 
-    setUser(data);
+    // setUser(data);
   }
 
   const logout = async () => {
     const {error} = await supabase.auth.signOut();
     setUser(null);
-    navigate("/");
+    // navigate("/connexion");
     window.location.reload();
   }
 
@@ -45,23 +46,31 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getUserData = () => {
       const subscription = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if(event === 'SIGNED_OUT'){
-          setSession(null);
-        }else if(session){
-          setSession(session);
-          setUser(session.user);
+        (event, session) => {
+          if(event === 'SIGNED_OUT'){
+            setSession(null);
+            setisLoggedIn(false);
+            navigate("/connexion");
+          }else if(session){
+            setSession(session);
+            setUser(session.user);
+            setisLoggedIn(true);
+            // navigate("/");
+          }
         }
-      }
-    );     
+      );     
     }
     getUserData();
+  // }, [navigate, isLoggedIn]);
   }, []);
 
-  
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout }}>
+    <AuthContext.Provider value={{ user, register, login, logout, isLoggedIn, handleGoBack }}>
       {children}
     </AuthContext.Provider>
   );

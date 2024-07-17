@@ -31,7 +31,7 @@ const Administrator = ({profile}) => {
     
 
     if(!loading){
-        return(<div className="container-xl p-5">Loading...</div>);
+      return(<LoadingPage />);
       }else{
         return(
 

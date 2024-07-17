@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../../config/dbConfig";
+import { useAuth }  from '../../config/userContext';
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Versements from '../../component/versements';
 
 const InfoAdherent = () => {
   const {personId} = useParams();
-  const [fetchData, setFetchData] = useState([]);
+    const { user, handleGoBack } = useAuth();
+    const [fetchData, setFetchData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
 
@@ -36,7 +38,8 @@ const InfoAdherent = () => {
     <div className="container-xl p-5">
         <div className="row">
             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                {/* {fetchData.map((person) => ( */}
+            <button onClick={handleGoBack}>Go Back</button>
+            {/* {fetchData.map((person) => ( */}
                     <div className="panel panel-info" key={fetchData.id}>
                         <div className="panel-heading">
                             <h3 className="panel-title"> {fetchData.nomdefamille} {fetchData.prenomdefamille} </h3>

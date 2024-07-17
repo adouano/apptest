@@ -53,3 +53,24 @@
     /* border-radius: 10rem; */
     border: 5px solid #eaf2ef;
 }
+.imgprofile{
+    border-radius: 3rem;
+    height: 2rem;
+    width: 2rem;
+    margin-right: 1rem;
+}
+/* .pagination {
+    padding: 2px 8px;
+    width: 40px;
+    height: 40px;
+    font-weight: 500;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+} */
+.pagination .active {
+    font-weight: 900;
+    background: #0024a9;
+    color: #f1f1fe;
+}

@@ -103,7 +103,7 @@ const AccountCreation = () => {
         <div className="container">
             <div className="card border-light-subtle shadow-sm">
                 <div className="row g-0">
-                    <div className="col-12 col-md-6 text-bg-primary">
+                    <div className="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-5 text-bg-primary">
                         <div className="d-flex align-items-center justify-content-center h-100">
                             <div className="col-10 col-xl-8 py-3">
                             <img src='https://png.pngtree.com/png-clipart/20190611/original/pngtree-wolf-logo-png-image_2306634.jpg' alt='logo' className="img-fluid rounded mb-4" loading="lazy" width="132" height="242" />
@@ -114,7 +114,7 @@ const AccountCreation = () => {
                         </div>
                     </div>
 
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-7">
                         <div className="card-body p-3 p-md-4 p-xl-5">
                             <div className="row">
                                 <div className="col-12">

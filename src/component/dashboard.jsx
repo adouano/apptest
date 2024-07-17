@@ -12,15 +12,16 @@ import LoginForm from './login';
 import Footer from '/src/footer';
 import Header from '/src/header';
 import Informaticien from './informaticien';
+import LoadingPage from './loading';
 
 
 const Dashboard = () => {
   // const {permission} = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [profile, setProfile] = useState();
+  const { user, isLoggedIn } = useAuth();
+  const [profile, setProfile] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userPermission, setUserPermission] = useState('');
+  // const userId = user["id"];
   let userId = user?.id;
 
   useEffect(() => {
@@ -28,11 +29,11 @@ const Dashboard = () => {
       try{
         const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
         // const { data, error } = await supabase.from('associates').select();
-
+        
         if(error){
           throw new Error(error.message);
         }
-        setProfile(data); 
+        setProfile(data);
         setLoading(false);
       }
       catch(error){
@@ -42,28 +43,22 @@ const Dashboard = () => {
     userProfile();
   }, [userId]);
 
-  if(loading){
-      return(<div className="container-xl p-5">Loading...</div>);
-    }else{
-      return (
-        !profile?.associate_id ? (
-          <>
-            {/* <LoginForm /> */}
-            {!profile.role && <LoginForm />}
-          </>
-        ):(
-          <>
-            <Header />
-              {profile.role === "admin" && <Administrator key={profile.associate_id} profile={profile} />}
-              {profile.role === "superviseur" && <Superviseur key={profile.associate_id} profile={profile} />}
-              {profile.role === "finance" && <Caissiere key={profile.associate_id} profile={profile} />}
-              {profile.role === "agent" && <Commercial key={profile.associate_id} profile={profile} />}
-              {profile.role === "informatic" && <Informaticien key={profile.associate_id} profile={profile} />}
-            <Footer />
-          </>
-        )
-      )
-    }
+
+  return (
+    user===null ? (
+      <LoginForm />
+    ):(
+      <>
+        <Header userProfile={profile} />
+          {profile?.role === "admin" && <Administrator key={profile.associate_id} profile={profile} />}
+          {profile?.role === "supervisor" && <Superviseur key={profile.associate_id} profile={profile} />}
+          {profile?.role === "finance" && <Caissiere key={profile.associate_id} profile={profile} />}
+          {profile?.role === "agent" && <Commercial key={profile.associate_id} profile={profile} />}
+          {profile?.role === "informatic" && <Informaticien key={profile.associate_id} profile={profile} />}
+        <Footer />
+      </>
+    )
+  )
 }
 
 export default Dashboard;
