@@ -61,7 +61,6 @@ const LoginForm = () => {
 
   return (
     <>
-
       <section className="account-connect bg-light m-auto">
         <div className="account-acces py-3 py-md-5">
           <div className="container">
@@ -113,8 +112,8 @@ const LoginForm = () => {
                           <div className="col-12">
                             <hr className="mt-5 mb-4 border-secondary-subtle" />
                             <div className="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-end">
-                              <Link to={"./inscription"} className="text-center link-secondary text-decoration-none">Creer un compte</Link>
-                              <a href="#!" className="link-secondary text-decoration-none">Reinitialiser votre mot de passe</a>
+                              <Link to={"/inscription"} className="text-center link-secondary text-decoration-none">Creer un compte</Link>
+                              <Link to={"/resetpassword"} className="link-secondary text-decoration-none">Reinitialiser votre mot de passe</Link>
                             </div>
                           </div>
                         </div>
@@ -127,7 +126,7 @@ const LoginForm = () => {
           </div>
         </div>
       </section>
-        </>
+    </>
   )
 }
 

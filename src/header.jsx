@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from './config/userContext';
 import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap';
 
-const Header = ({userProfile}) => {
+const Header = ({userprofile}) => {
     const { logout } = useAuth();
     return (
     <>
@@ -12,7 +12,7 @@ const Header = ({userProfile}) => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="/ajout_adherent">Ajouter Adherent</Nav.Link>
+                        <Nav.Link href="/adherent/ajouter">Ajouter Adherent</Nav.Link>
                         {/* <Nav.Link href="/admin">Administrateur</Nav.Link>
                         <Nav.Link href="/superviseur">Superviseur</Nav.Link>
                         <Nav.Link href="/agent">Commercial</Nav.Link>
@@ -20,10 +20,10 @@ const Header = ({userProfile}) => {
                         <Nav.Link href="#">Informaticien</Nav.Link> */}
                     </Nav>
                     <Nav className="justify-content-end">
-                        <NavDropdown title={<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" className="rounded-circle" />} id="basic-nav-dropdown">
-                            <NavDropdown.Item href={`/${userProfile?.associate_id}/profile`}>Profil</NavDropdown.Item>
-                            {userProfile?.role=='admin' ? (
-                                <NavDropdown.Item href="/configuration">Configuration</NavDropdown.Item>
+                        <NavDropdown title={<img src={userprofile?.photodeprofil} alt={userprofile?.nomdefamille} width="32" height="32" className="rounded-circle" />} id="basic-nav-dropdown">
+                            <NavDropdown.Item href={`/${userprofile?.associate_id}/userprofile`}>Profil</NavDropdown.Item>
+                            {userprofile?.role=='admin' ? (
+                                <NavDropdown.Item href={`/${userprofile?.associate_id}/configuration`}>Configuration</NavDropdown.Item>
                             ):(<></>)}
                             <NavDropdown.Item href="/">Accueil</NavDropdown.Item>
                             <NavDropdown.Divider />

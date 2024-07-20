@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {useNavigate, Routes, Route, Link} from 'react-router-dom';
-import { AuthProvider } from './config/userContext';
+import { AuthProvider, useAuth } from './config/userContext';
 import ProtectedRoute from './config/ProtectedRoute';
-import { useAuth } from './config/userContext';
 
 // import './App.css';
 import LoginForm from './component/login';
@@ -24,13 +23,13 @@ import Dashboard from './component/dashboard';
 import Header from './header';
 import Footer from './footer';
 import RegistrationSuccess from './component/reg_success';
+import ResetPassword from './component/resetpassword';
 
 
 function App() {
   // const { user } = useAuth();
-  const navigate = useNavigate();
-
   // console.log(user);
+  const navigate = useNavigate();
  
   return (
     
@@ -51,8 +50,9 @@ function App() {
         <Route path="relative/:personId/info" element={<InfoRelative />} />
         <Route path="relative/:personId/modifier" element={<EditRelative />} />
         <Route path=":userId/profile" element={<Profile />} />
-        <Route path="configuration" element={<Configuration />} />
+        <Route path=":userId/configuration" element={<Configuration />} />
         <Route path="reg_success" element={<RegistrationSuccess />} />
+        <Route path="resetpassword" element={<ResetPassword />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       {/* <Footer /> */}

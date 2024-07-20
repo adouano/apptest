@@ -74,3 +74,12 @@
     background: #0024a9;
     color: #f1f1fe;
 }
+.pprofile .banner{
+    background-image: url(/src/assets/profilebg.jpg) !important;
+    background-size: "cover";
+    height: 200px;
+    margin-bottom: 25px;
+}
+.suppbtn button {
+    padding: 2px;
+}

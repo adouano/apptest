@@ -19,29 +19,31 @@ const Dashboard = () => {
   // const {permission} = useParams();
   const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
-  const [profile, setProfile] = useState([]);
+  const [profile, setProfile] = useState('');
   const [loading, setLoading] = useState(true);
   // const userId = user["id"];
   let userId = user?.id;
 
-  useEffect(() => {
-    const userProfile = async () => {
-      try{
-        const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
-        // const { data, error } = await supabase.from('associates').select();
-        
-        if(error){
-          throw new Error(error.message);
-        }
-        setProfile(data);
-        setLoading(false);
+  const userProfile = async () => {
+    try{
+      const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+      
+      if(error){
+        throw new Error(error.message);
       }
-      catch(error){
-        console.log("Error: ", error);
-      }
+      setProfile(data);
+      setLoading(false);
     }
+    catch(error){
+      console.log("Error: ", error);
+    }
+  }
+
+  useEffect(() => {
     userProfile();
   }, [userId]);
+
+  console.log(userId);
 
 
   return (
@@ -49,12 +51,12 @@ const Dashboard = () => {
       <LoginForm />
     ):(
       <>
-        <Header userProfile={profile} />
-          {profile?.role === "admin" && <Administrator key={profile.associate_id} profile={profile} />}
-          {profile?.role === "supervisor" && <Superviseur key={profile.associate_id} profile={profile} />}
-          {profile?.role === "finance" && <Caissiere key={profile.associate_id} profile={profile} />}
-          {profile?.role === "agent" && <Commercial key={profile.associate_id} profile={profile} />}
-          {profile?.role === "informatic" && <Informaticien key={profile.associate_id} profile={profile} />}
+        <Header userprofile={profile} />
+          {profile?.role === "admin" && <Administrator key={profile.associate_id} userprofile={profile} />}
+          {profile?.role === "supervisor" && <Superviseur key={profile.associate_id} userprofile={profile} />}
+          {profile?.role === "finance" && <Caissiere key={profile.associate_id} userprofile={profile} />}
+          {profile?.role === "agent" && <Commercial key={profile.associate_id} userprofile={profile} />}
+          {profile?.role === "informatic" && <Informaticien key={profile.associate_id} userprofile={profile} />}
         <Footer />
       </>
     )

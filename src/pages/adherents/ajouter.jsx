@@ -33,6 +33,8 @@ const AjoutAdherent = () => {
     });
     const [formError, setFormError] = useState();
     const [profilePhoto, setProfilePhoto] = useState();
+    const [userData, setUserData] = useState('');
+    let userId = user?.id;
 
     const [numDossier, setNumDossier] = useState(0);
     useEffect(() => {
@@ -43,6 +45,26 @@ const AjoutAdherent = () => {
     }, []);
     const enrolDossier = new Date().getFullYear()+'GC'+numDossier;
     // const enrolDossier = new Date().getFullYear()+'GC'+Math.floor(Math.random() (99999 - 1 + 1)) + 1;
+
+    useEffect(() => {
+        const fetchUser = async() => {
+            try{
+                const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+
+                if(error){
+                    throw new Error("Une erreur s'est produite....");
+                }
+                setUserData(data);
+            }
+            catch(error){
+                console.log("Error :" + error);
+            }
+        }
+
+        fetchUser();
+    }, [userId]);
+
+    console.log(userData);
 
     const handleOnChange = (e) => {
         const {name,value,files} = e.target;
@@ -102,8 +124,8 @@ const AjoutAdherent = () => {
         })
         .select();
 
-        console.log(data);
-        console.log(user?.id);
+        // console.log(data);
+        // console.log(user?.id);
   
         if(!error){
             setFormError(null);
@@ -122,20 +144,23 @@ const AjoutAdherent = () => {
         <div className="container-xl p-5">
             <div className="container-fluid">
             <h1 className="page-title"> Nouveau Adhérent  </h1>
-            <button onClick={handleGoBack}>Go Back</button>
             <div className="col-md-12 col-lg-12">
 
                 {formError && <Alert className="alert alert-danger">{formError}</Alert>}
                     <form onSubmit={handleSubmit}>
 
                         <div className='row mb-3'>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
                                 <label htmlFor="numdossier" className="form-label"> Numero de Dossier : </label>
                                 <input type="text" className="form-control" name="numdossier" id="numdossier" value={enrolDossier} onChange={handleOnChange} disabled />
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
                                 <label htmlFor="numdvlottery" className="form-label"> Numero DV Lottery : </label>
                                 <input type="text" className="form-control" name="numdvlottery" id="numdvlottery" value="" placeholder="Numero de confirmation DV Lottery" disabled />
+                            </div>
+                            <div className="col-md-4">
+                                <label htmlFor="enrollocation" className="form-label"> Bureau d'enrollement: </label>
+                                <input type="text" className="form-control" name="enrollocation" id="enrollocation" value={userData.lieudemission} onChange={handleOnChange}  placeholder="Lieu/Bureau d'enrollement" disabled />
                             </div>
                         </div>
 

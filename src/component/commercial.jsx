@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import supabase from "../config/dbConfig";
 // import { Button, Pagination } from "react-bootstrap";
 import {Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '../config/userContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCoffee, faCheckSquare } from '@fortawesome/free-solid-svg-icons';
 import LoadingPage from "./loading";
 import AdherentList from "./adherentList";
 import Pagination from "./pagination";
 import AjoutAdherent from "../pages/adherents/ajouter";
 
-const Commercial = ({profile}) => {
+const Commercial = ({userprofile}) => {
     const navigate = useNavigate();
-  const { user } = useAuth();
-  const [fetchData, setFetchData] = useState([]);
+    const { user } = useAuth();
+    const [fetchData, setFetchData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
 
@@ -81,7 +79,10 @@ const Commercial = ({profile}) => {
     //         const itemCategory = itemData.categories.name.toLowerCase().includes(search.toLowerCase());
     //         return itemName || itemDesc || itemCondition || itemCategory;
     //     });
-    // } 
+    // }
+
+    const date = new Date();
+    const hour = date.getHours();
 
     if(loading){
       return(<LoadingPage />);
@@ -92,8 +93,8 @@ const Commercial = ({profile}) => {
                 <div className="container-xl p-5">
                     <div className="row align-items-center justify-content-between">
                         <div className="col-12 col-md mb-4 mb-md-0">
-                            <h1 className="mb-1 display-4 fw-500 text-white">Welcome back, {profile.prenoms}!</h1>
-                            <p className="lead mb-0 text-white">Your dashboard is ready to go!</p>
+                            <h1 className="mb-1 display-4 fw-500 text-white"> {hour < 12 ? "Bonjour":(hour < 17 ? "Bonsoir":"Bonne soiree")}, {userprofile.prenoms}!</h1>
+                            <p className="lead mb-0 text-white"> {hour < 17 ? "Nous avons du boulot aujourd'hui!":"Demain est un autre jour; bon repos!!"}</p>
                         </div>
                         {/* <div className="col-12 col-md-auto flex-shrink-0">
                             <label className="form-label text-white-50" htmlFor="litepickerDateRange">Date range:</label>
@@ -116,13 +117,6 @@ const Commercial = ({profile}) => {
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-person-add" style={{fontSize: "5rem", color:"black"}}></i></div>
                                 </div>
-                            {/* <div className="card-text">
-                                    <div className="d-inline-flex align-items-center">
-                                        <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                        <div className="caption text-success fw-500 me-2">3%</div>
-                                        <div className="caption">from last month</div>
-                                    </div>
-                                </div>*/}
                             </div>
                         </div>
                     </div>
@@ -136,13 +130,6 @@ const Commercial = ({profile}) => {
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-cash-coin" style={{fontSize: "5rem", color:"black"}}></i></div>
                                 </div>
-                                {/* <div className="card-text">
-                                    <div className="d-inline-flex align-items-center">
-                                        <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                        <div className="caption text-success fw-500 me-2">3%</div>
-                                        <div className="caption">from last month</div>
-                                    </div>
-                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -156,13 +143,6 @@ const Commercial = ({profile}) => {
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-wallet2" style={{fontSize: "5rem", color:"black"}}></i></div>
                                 </div>
-                                {/* <div className="card-text">
-                                    <div className="d-inline-flex align-items-center">
-                                        <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                        <div className="caption text-success fw-500 me-2">3%</div>
-                                        <div className="caption">from last month</div>
-                                    </div>
-                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -176,13 +156,6 @@ const Commercial = ({profile}) => {
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-people" style={{fontSize: "5rem", color:"black"}}></i></div>
                                 </div>
-                                {/* <div className="card-text">
-                                    <div className="d-inline-flex align-items-center">
-                                        <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                        <div className="caption text-success fw-500 me-2">3%</div>
-                                        <div className="caption">from last month</div>
-                                    </div>
-                                </div> */}
                             </div>
                         </div>
                     </div>

@@ -5,7 +5,8 @@ import {useNavigate} from 'react-router-dom';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState('');
+  const [getUId, setUserId] = useState('');
   const [session, setSession] = useState(null);  
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const navigate = useNavigate();
@@ -33,16 +34,6 @@ export const AuthProvider = ({ children }) => {
     window.location.reload();
   }
 
-  // const login = (userData) => {
-  //   // Implement login logic here (e.g., API call)
-  //   setUser(userData);
-  // };
-
-  // const logout = () => {
-  //   // Implement logout logic here
-  //   setUser(null);
-  // };
-
   useEffect(() => {
     const getUserData = () => {
       const subscription = supabase.auth.onAuthStateChange(
@@ -67,7 +58,6 @@ export const AuthProvider = ({ children }) => {
   const handleGoBack = () => {
     navigate(-1);
   };
-
 
   return (
     <AuthContext.Provider value={{ user, register, login, logout, isLoggedIn, handleGoBack }}>
