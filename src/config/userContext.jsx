@@ -6,7 +6,9 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState('');
-  const [getUId, setUserId] = useState('');
+  const [userError, setUserError] = useState('');
+  const [getUId, setGetUId] = useState('');
+  const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);  
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const navigate = useNavigate();
@@ -18,13 +20,11 @@ export const AuthProvider = ({ children }) => {
     });
   }
 
-  const login = (email, password) => {
-    const { data, error } = supabase.auth.signInWithPassword({
+  const login = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password
     });
-
-    // setUser(data);
   }
 
   const logout = async () => {
@@ -34,24 +34,32 @@ export const AuthProvider = ({ children }) => {
     window.location.reload();
   }
 
-  useEffect(() => {
-    const getUserData = () => {
-      const subscription = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          if(event === 'SIGNED_OUT'){
-            setSession(null);
-            setisLoggedIn(false);
-            navigate("/connexion");
-          }else if(session){
-            setSession(session);
-            setUser(session.user);
-            setisLoggedIn(true);
-            // navigate("/");
-          }
+  // const getUserId = async () => {
+  //   const { data: { user } } = await supabase.auth.getUser();
+  //   setGetUId(user.id);
+  //   // console.log(data);
+  // }
+
+  const getUserData = () => {
+    const subscription = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if(event === 'SIGNED_OUT'){
+          setSession(null);
+          setisLoggedIn(false);
+          navigate("/connexion");
+        }else if(session){
+          setSession(session);
+          setUser(session.user);
+          setGetUId(session.user.id);
+          setisLoggedIn(true);
+          // navigate("/");
         }
-      );     
-    }
+      }
+    );     
+  }
+  useEffect(() => {
     getUserData();
+    // getUserId();
   // }, [navigate, isLoggedIn]);
   }, []);
 
@@ -60,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout, isLoggedIn, handleGoBack }}>
+    <AuthContext.Provider value={{ user, register, login, logout, isLoggedIn, handleGoBack, userError, getUId, profile }}>
       {children}
     </AuthContext.Provider>
   );

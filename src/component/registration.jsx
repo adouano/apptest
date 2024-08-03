@@ -21,9 +21,15 @@ const AccountCreation = () => {
 
     const [userError, setUserError] = useState();
     const [profilePhoto, setProfilePhoto] = useState();
+    const [imgSrc, setImgSrc] = useState('');
     const [mlocation, setMlocation] = useState([]);
-    // let status = 0;
-    // let init_delete = 1;
+    const [delCode, setDelCode] = useState(0);
+    useEffect(() => {
+        const NumAleatoire = () => {
+            return Math.floor(Math.random() * (99999 - 1 + 1)) + 1;
+        }
+        setDelCode(NumAleatoire());
+    }, []);
 
     useEffect(() => {
         const fetchLocation = async() => {
@@ -53,15 +59,32 @@ const AccountCreation = () => {
     const handleOnChange = (e) => {
         const {name,value,files} = e.target;
         setUserData({...userData, [name]:value});
+
+        const file = e.target.files?.[0];
+        const imgType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if(!imgType.includes(file.type)){
+            setUserError("Extension d'image invalide");
+            return;
+        } 
         if(files){
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                const imageUrl = reader.result?.toString() || '' ;
+                setImgSrc(imageUrl);
+            });
+            reader.readAsDataURL(file);
             setProfilePhoto(URL.createObjectURL(files[0]));
         }        
     }
 
     const handleSubmit = async(e) => {
+
+        console.log(imgSrc);
+        console.log(userData.profilephoto);
+
         e.preventDefault();
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-        if(!userData.nomfamille || !userData.prenoms || !userData.lieumission || !userData.role || !userData.telephone || !userData.email || !userData.password || !userData.confirmpassword || !userData.profilephoto){
+        if(!userData.nomfamille || !userData.prenoms || !userData.lieumission || !userData.role || !userData.telephone || !userData.email || !userData.password || !userData.confirmpassword){
             setUserError("Tous les champs sont obligatoires.");
             return;
         }
@@ -77,6 +100,19 @@ const AccountCreation = () => {
             setUserError("Veuillez verifier le format de l'adresse email.");
             return;
         }
+
+        // const file = e.target.files?.[0];
+        // if(!imgType.includes(file.type)){
+        //     setUserError("Extension d'image invalide");
+        //     return;
+        // } 
+
+        // const reader = new FileReader();
+        // reader.addEventListener('load', () => {
+        //     const imageUrl = reader.result?.toString() || '' ;
+        //     setImgSrc(imageUrl);
+        // });
+        // reader.readAsDataURL(file);
 
         // // Verification email
         // useEffect(async () => {
@@ -99,10 +135,10 @@ const AccountCreation = () => {
             if(data && !error){
                 const userId = data.user.id;
                 // const saveProfileImg = e.target.files[0];
-                await supabase.storage
-                .from('associatesimg')
-                .upload(userId + '/' + getFullYear(), profilePhoto)
-                .select();
+                // await supabase.storage
+                // .from('associatesimg')
+                // .upload(userId + '/' + getFullYear(), userData.profilephoto)
+                // .select();
 
                 await supabase
                 .from("associates")
@@ -113,9 +149,11 @@ const AccountCreation = () => {
                     lieudemission: userData.lieumission,
                     role: userData.role,
                     num_telephone: userData.telephone,
-                    photodeprofil: saveProfileImg,
-                    status:0,
-                    // init_delete:1,                    
+                    photodeprofil: imgSrc,
+                    email:data.email,
+                    status:'false',
+                    supp_intention:'false',
+                    supp_code:delCode
                 })
                 // .single()
                 // .returning('id');
@@ -130,7 +168,6 @@ const AccountCreation = () => {
             setUserError(error.message);
         }
     }
-            
 
   return (
     <>
@@ -220,7 +257,7 @@ const AccountCreation = () => {
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="file" className="form-control" name="saveProfileImg" accept='image/jpg, image/jpeg, image/png' id="profilephoto" placeholder='' onChange={handleOnChange} required />
+                                            <input type="file" className="form-control" name="saveProfileImg" accept='image/jpg, image/jpeg, image/png, image/webp' id="profilephoto" placeholder='' onChange={handleOnChange} required />
                                             <label htmlFor='profilephoto'>Photo de profil</label>
                                         </div>
                                         <div className="col-md-12 mt-2 d-flex justify-content-center">

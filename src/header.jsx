@@ -1,9 +1,14 @@
 import React from 'react';
 import { useAuth } from './config/userContext';
 import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap';
+import defaultAvatar from '/src/assets/avatar-profile.webp';
 
 const Header = ({userprofile}) => {
-    const { logout } = useAuth();
+    const { logout,user } = useAuth();
+
+    // a revoir
+    // console.log(user);
+
     return (
     <>
         <Navbar expand="lg" className="bg-body-tertiary">
@@ -20,8 +25,13 @@ const Header = ({userprofile}) => {
                         <Nav.Link href="#">Informaticien</Nav.Link> */}
                     </Nav>
                     <Nav className="justify-content-end">
-                        <NavDropdown title={<img src={userprofile?.photodeprofil} alt={userprofile?.nomdefamille} width="32" height="32" className="rounded-circle" />} id="basic-nav-dropdown">
-                            <NavDropdown.Item href={`/${userprofile?.associate_id}/userprofile`}>Profil</NavDropdown.Item>
+                        <NavDropdown title={
+                            !userprofile?.photodeprofil ? (
+                                <img src={defaultAvatar} width="32" height="32" className="rounded-circle" />
+                                ):(
+                                <img src={userprofile?.photodeprofil} alt={userprofile?.nomdefamille} width="31" height="31" className="rounded-circle" />
+                            )} id="basic-nav-dropdown">                            
+                            <NavDropdown.Item href={`/${userprofile?.associate_id}/profile`}>Profil</NavDropdown.Item>
                             {userprofile?.role=='admin' ? (
                                 <NavDropdown.Item href={`/${userprofile?.associate_id}/configuration`}>Configuration</NavDropdown.Item>
                             ):(<></>)}

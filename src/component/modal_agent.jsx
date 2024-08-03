@@ -1,35 +1,58 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import supabase from '../config/dbConfig';
 import {Button, Modal, Card, ListGroup} from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const ModalInfoAgent = ({associate}) => {
-    const [show, setShow] = useState(false);
-    const [statuts, setStatus] = useState(0);
+  const navigate = useNavigate();
+  const [show, setShow] = useState(false);
+  const [statuts, setStatuts] = useState(!associate?.status);
 
-    const handleStatus = async(statusId) => {
+  const handleStatus = async () => {
+    setStatuts(statuts);
+    try{
+      const { data, error } = await supabase
+        .from('associates')
+        .update({ status:statuts })
+        .eq('id', associate?.id)
+        .select();
 
-        console.log(statuts);
-        // setStatus(!statuts);
-        setStatus(statuts === '1' ? 0 : 1);
-
-        try{
-            const { data, error } = await supabase
-              .from('associates')
-              .update({ status: statuts })
-              .eq('id', statusId);
-
-            if (error) {
-              throw new Error("Impossible de changer le statut...");
-            }
-            setShow(false)
-        }
-        catch(error){
-          console.log("Erreur de changement :", error);
-        }
+      if (error) {
+        throw new Error(error.message);
+      }
+      window.location.reload();
+      // navigate('/');
+      setShow(false);
     }
+    catch(error){
+      console.log("Erreur :", error);
+    }
+  }
+
+  const delectUserAccount = async() => {
+    try{
+      const {data, error} = await supabase
+        .from('associates')
+        .update({
+            status:'false',
+            supp_intention:'true'
+        })
+        .eq('id', associate?.id)
+        .select();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      navigate('/');
+      setShow(false);
+    }
+    catch(error){
+        console.log("Erreur : ", error);
+    }
+  }
   
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   return (
     <>
@@ -37,30 +60,32 @@ const ModalInfoAgent = ({associate}) => {
 
       <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{associate.nomdefamille} {associate.prenoms}</Modal.Title>
+          <Modal.Title style={{textAlign: 'center'}}>{associate.nomdefamille} {associate.prenoms}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
             <Card style={{ width: '100%' }}>
-                <Card.Img variant="top" src={associate.photodeprofil} />
+                <Card.Img variant="top" src={associate?.photodeprofil} />
                 <Card.Body>
-                    <Card.Title>{associate?.role==='admin' ? ("Administrateur"):(associate?.role==='supervisor' ? ("Superviseur"):(associate?.role==='agent' ? ("Commercial"):(associate?.role==='finance' ? ("Caissiere"):("Informaticien"))))}</Card.Title>
+                    <Card.Title><i className="bi-briefcase-fill" style={{padding: "10px"}}></i> {associate?.role==='admin' ? ("Administrateur"):(associate?.role==='supervisor' ? ("Superviseur"):(associate?.role==='agent' ? ("Commercial"):(associate?.role==='finance' ? ("Caissiere"):("Informaticien"))))}</Card.Title>
                     {/* <Card.Text>
                     Some quick example text to build on the card title and make up the
                     bulk of the card's content.
                     </Card.Text> */}
                 </Card.Body>
                 <ListGroup className="list-group-flush">
-                    <ListGroup.Item>{associate.lieudemission}</ListGroup.Item>
-                    <ListGroup.Item>{associate.num_telephone}</ListGroup.Item>
-                    <ListGroup.Item variant={associate?.status === '0' ? 'success' : 'danger'}>Statut : {associate?.status === '0' ? 'Activer' : 'Desactiver'}</ListGroup.Item>
+                    <ListGroup.Item><i className="bi-building-fill" style={{padding: "10px"}}></i> {associate.lieudemission}</ListGroup.Item>
+                    <ListGroup.Item><i className="bi-envelope-at-fill" style={{padding: "10px"}}></i> {associate.email}</ListGroup.Item>
+                    <ListGroup.Item><i className="bi-phone-fill" style={{padding: "10px"}}></i> {associate.num_telephone}</ListGroup.Item>
+                    <ListGroup.Item variant={associate?.status ? 'success':'danger'} style={{padding: "10px"}}>Statut : {associate?.status ? 'Actif':'Inactif'} </ListGroup.Item>
                 </ListGroup>
             </Card>
         </Modal.Body>
 
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>X</Button>
-          <Button onClick={() => handleStatus(associate?.id)} className={`btn bg-gradient ${associate?.status === '0' ? 'btn-success' : 'btn-danger'}`}> {associate?.status === '0' ? (<i className="bi-unlock-fill" style={{padding: "-10px"}}></i>) : (<i className="bi-lock-fill" style={{padding: "-10px"}}></i>)} </Button>
+          <Button onClick={handleStatus} className={associate?.status ? 'btn bg-gradient btn-warning':'btn bg-gradient btn-success'}> {associate?.status ? (<i className="bi-lock-fill" style={{padding: "-10px"}}> Desactiver</i>):(<i className="bi-unlock-fill" style={{padding: "-10px"}}> Activer</i>)} </Button>
+          <Button variant="danger" onClick={delectUserAccount}><i className="bi-trash-fill" style={{padding: "-10px"}}> Supprimer</i></Button>
         </Modal.Footer>
       </Modal>
     </>

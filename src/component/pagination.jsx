@@ -1,7 +1,7 @@
 import React from "react";
 
 const Pagination = ({totalPerson, personPerPage, currentPage, setCurrentPage}) => {
-    let pages = []    ;
+    let pages = [];
     // const pageCount = Math.ceil(fetchData.length / personPerPage);
     const pageCount = Math.ceil(totalPerson / personPerPage);
     for(let i = 1; i <= pageCount; i++){

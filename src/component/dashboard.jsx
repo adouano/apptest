@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Link, useParams, useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import supabase from '../config/dbConfig';
 import { useAuth } from '../config/userContext';
 
@@ -13,15 +13,14 @@ import Footer from '/src/footer';
 import Header from '/src/header';
 import Informaticien from './informaticien';
 import LoadingPage from './loading';
+import TestUpload from './testfileupload';
 
 
 const Dashboard = () => {
-  // const {permission} = useParams();
   const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
   const [profile, setProfile] = useState('');
   const [loading, setLoading] = useState(true);
-  // const userId = user["id"];
   let userId = user?.id;
 
   const userProfile = async () => {
@@ -43,14 +42,10 @@ const Dashboard = () => {
     userProfile();
   }, [userId]);
 
-  console.log(userId);
-
-
   return (
-    user===null ? (
-      <LoginForm />
-    ):(
+    user?.id !== undefined && profile?.status !== '0' ? (
       <>
+      {/* <TestUpload /> */}
         <Header userprofile={profile} />
           {profile?.role === "admin" && <Administrator key={profile.associate_id} userprofile={profile} />}
           {profile?.role === "supervisor" && <Superviseur key={profile.associate_id} userprofile={profile} />}
@@ -59,6 +54,8 @@ const Dashboard = () => {
           {profile?.role === "informatic" && <Informaticien key={profile.associate_id} userprofile={profile} />}
         <Footer />
       </>
+    ):(
+      <LoginForm />
     )
   )
 }

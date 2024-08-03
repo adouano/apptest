@@ -2,14 +2,17 @@ import React, {useState, useEffect} from 'react';
 import supabase from '../config/dbConfig';
 import { useAuth } from '../config/userContext';
 import {Form, Button, Row, Col} from 'react-bootstrap';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from '../header';
 import Footer from '../footer';
+import ProfileModal from './profile_modal';
 import background from '/src/assets/profilebg.jpg';
+import defaultAvatar from '/src/assets/avatar-profile.webp';
 
 const Profile = () => {
     const { user } = useAuth();
     const {userId} = useParams();
+    const navigate = useNavigate();
     const [profile, setProfile] = useState([]);
     const [firstName, setFirstName] = useState();
     const [prenoms, setPrenoms] = useState();
@@ -19,6 +22,7 @@ const Profile = () => {
     const [newPassword, setNewPassword] = useState();
     const [confirmPass, setConfirmPass] = useState();
     const [deletAccount, setDeletAccount] = useState();
+    const [openModal, setOpenModal] = useState(false);
     const [profilePhoto, setProfilePhoto] = useState();
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -40,16 +44,16 @@ const Profile = () => {
         userProfile();
     }, [userId]);
 
-    const handleFileChange = (e) => {
-        const {name,value,files} = e.target;
-        if(files){
-            setProfilePhoto(URL.createObjectURL(files[0]));
+    const [numCode, setNumCode] = useState(0);
+    useEffect(() => {
+        const NumAleatoire = () => {
+            return Math.floor(Math.random() * (99999 - 1 + 1)) + 1;
         }
-    }
+        setNumCode(NumAleatoire());
+    }, []);
 
     const majInfoPerso = async(e) => {
         e.preventDefault();
-
         try{
             const { data, error } = await supabase
             .from('associates')
@@ -58,6 +62,8 @@ const Profile = () => {
                 prenoms: prenoms,
                 num_telephone: numPhone,
                 photodeprofil: profilePhoto,
+                email: newEmail,
+                supp_code:numCode
             })
             .eq("associate_id", userId)
             .select();
@@ -75,6 +81,7 @@ const Profile = () => {
         }
     }
 
+    // a revoir
     const handlePassUpdate = async(e) => {
         e.preventDefault();
         // console.log(encrypted_password);
@@ -85,34 +92,56 @@ const Profile = () => {
         }
         if(await bcrypt.compare(newPassword,user?.password)){
             setErrorMsg("Le mot de passe est identique a l'ancien.");
+            return;
         }
         if(newPassword !== confirmPass){
-            setErrorMsg("Les mots de passes doivent etre identique.")
+            setErrorMsg("Les mots de passes doivent etre identique.");
+            return;
         }
 
         try{
-            const { data, error } = await supabase.auth.updateUser({
+            const { data,error } = await supabase.auth.updateUser({
                 password: newPassword
             })
         }
         catch(error){
             console.log(error.message);
         }
-    }
+    }    
 
-    const deleteAccount = () => {}
+    const delectUserAccount = async(e) => {
+        e.preventDefault();
+        try{
+            const {dat,error} = await supabase
+            .from('associates')
+            .update({
+                status:0,
+                supp_intention:'TRUE'
+            })
+            .eq('supp_code',deletAccount)
+            .select();
+        navigate('/');
+        }
+        catch(error){
+            console.log(error.message);
+        }
+    }
 
 
     return (
     <>
-    <Header />
+    <Header userprofile={profile} />
         <div className='content bg-secondary-soft'>
 
             <div className="rounded-top text-white d-flex flex-row" style={{backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundColor: "#000", height: "200px", marginBottom: "25px"}}>
                 <div className="ms-4 mt-3 mb-5 d-flex flex-column" style={{width: "150px"}}>
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D" alt="Generic placeholder image" className="img-fluid img-thumbnail mt-4 mb-2" style={{width: "150px", zIndex: "1"}} />
-                    <img src={profile.photodeprofil} alt={profile.nomdefamille} className="img-fluid img-thumbnail mt-4 mb-2" style={{width: "150px", zIndex: "1"}} />
-                    <input type="file" name="profilephoto" id="profilephoto" className="btn btn-outline-warning text-body" data-mdb-ripple-color="dark" style={{zIndex: 1}} onChange={handleFileChange} /> Modifier Photo
+                    {!profile.photodeprofil ? (
+                        <img src={defaultAvatar} className="img-fluid img-thumbnail mt-5 mb-2" />
+                    ):(
+                        <img src={profile.photodeprofil} alt={profile.nomdefamille} className="img-fluid img-thumbnail mt-5 mb-2" style={{width: "150px", zIndex: "1"}} />
+                    )}
+                    
+                    <ProfileModal profile={profile} />
                 </div>
                 <div className="ms-4" style={{marginTop: "90px"}}>
                     <h4>{profile.nomdefamille}</h4>
@@ -179,14 +208,14 @@ const Profile = () => {
 
                 <hr/>
                 
-                <Form onSubmit={deleteAccount}>
+                <Form onSubmit={delectUserAccount}>
                     <h2>Supprimer mon compte </h2>
                     <Form.Text className="text-muted"> Si vous souhaitez annuler votre compte, vous pouvez le faire dès maintenant. <span variant='danger'>Veuillez noter qu'il s'agit d'une action permanente et irréversible.</span> Cela supprimera toutes vos données et projets. Pour terminer cette action, veuillez saisir le numéro exactement comme vous le voyez ci-dessous. </Form.Text>
                     <Form.Group className="mb-3" controlId="formBasicPassword">
-                        <Form.Label> Code de Confirmation : 18934 {profile.delet_code} </Form.Label>
+                        <Form.Label> Code de Confirmation : {profile.supp_code} </Form.Label>
                         <Form.Control type="ext" placeholder="Entrer le code pour confirmer" onChange={(e) => setDeletAccount(e.target.value)} />
                     </Form.Group>
-                    <Button variant="danger" type="submit" onClick={deleteAccount}>Supprimer</Button>
+                    <Button variant="danger" type="submit" onClick={delectUserAccount}>Supprimer</Button>
                 </Form>
             </div>
         </div>

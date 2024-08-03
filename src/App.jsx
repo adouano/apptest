@@ -25,6 +25,9 @@ import Footer from './footer';
 import RegistrationSuccess from './component/reg_success';
 import ResetPassword from './component/resetpassword';
 
+import TestUpload from './component/testfileupload';
+import Associates from './component/associates';
+
 
 function App() {
   // const { user } = useAuth();
@@ -53,7 +56,10 @@ function App() {
         <Route path=":userId/configuration" element={<Configuration />} />
         <Route path="reg_success" element={<RegistrationSuccess />} />
         <Route path="resetpassword" element={<ResetPassword />} />
+        <Route path="associates" element={<Associates />} />
         <Route path="*" element={<ErrorPage />} />
+
+        {/* <Route path="uploadimg" element={<TestUpload />} /> */}
       </Routes>
       {/* <Footer /> */}
     </AuthProvider>

@@ -8,7 +8,7 @@ import Footer from '/src/footer';
 import Header from '/src/header';
 
 const AjoutAdherent = () => {
-    const { user, handleGoBack } = useAuth();
+    const { user, getUId } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         numdvlottery:"",
@@ -34,6 +34,7 @@ const AjoutAdherent = () => {
     const [formError, setFormError] = useState();
     const [profilePhoto, setProfilePhoto] = useState();
     const [userData, setUserData] = useState('');
+    const [imgSrc, setImgSrc] = useState('');
     let userId = user?.id;
 
     const [numDossier, setNumDossier] = useState(0);
@@ -44,41 +45,51 @@ const AjoutAdherent = () => {
         setNumDossier(NumDossierAleatoire());
     }, []);
     const enrolDossier = new Date().getFullYear()+'GC'+numDossier;
-    // const enrolDossier = new Date().getFullYear()+'GC'+Math.floor(Math.random() (99999 - 1 + 1)) + 1;
+    // const enrolDossier = new Date().getFullYear()+'GC'+Math.floor(Math.random() * (99999 - 1 + 1)) + 1;
 
-    useEffect(() => {
-        const fetchUser = async() => {
-            try{
-                const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+    const fetchUser = async() => {
+        try{
+            const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
 
-                if(error){
-                    throw new Error("Une erreur s'est produite....");
-                }
-                setUserData(data);
+            if(error){
+                throw new Error(error.message);
             }
-            catch(error){
-                console.log("Error :" + error);
-            }
+            setUserData(data);
         }
-
+        catch(error){
+            console.log("Error :" + error);
+        }
+    }
+    useEffect(() => {
         fetchUser();
     }, [userId]);
-
-    console.log(userData);
 
     const handleOnChange = (e) => {
         const {name,value,files} = e.target;
         setFormData({...formData, [name]:value});
+
+        const file = e.target.files?.[0];
+        const imgType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if(!imgType.includes(file.type)){
+            setFormError("Extension d'image invalide");
+            return;
+        } 
         if(files){
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                const imageUrl = reader.result?.toString() || '' ;
+                setImgSrc(imageUrl);
+            });
+            reader.readAsDataURL(file);
             setProfilePhoto(URL.createObjectURL(files[0]));
-        }
+        }        
     }
 
     const handleSubmit = async (e) => {
-        console.log(formData);
-        // console.dir(enrolDossier);
-        e.preventDefault(); 
-        // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        // console.log(formData);
+        e.preventDefault();
+        let nbreProtege = 0;
+       // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
         // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_+-=[]{};':"|\\,.<>/?]).{8,}$/i;
@@ -96,12 +107,15 @@ const AjoutAdherent = () => {
             setFormError("Le numero de telephone doit contenir 10 caracteres.");
             return;
        }
+       if(formData.nombrelative !== ''){
+            nbreProtege = formData.nombrelative;
+       }
 
        try{
         const { data, error } = await supabase
         .from('dvenrollment')
         .insert({
-            agent_id:user?.id,
+            associate_id:user?.id,
             numerodvlottery:null,
             numerodossier:enrolDossier,
             nomdefamille:formData.nomfamille,
@@ -112,35 +126,39 @@ const AjoutAdherent = () => {
             paysdenaissance:formData.pays,
             adresseemail:formData.email,
             adressepostal:formData.adresse,
+            codepostal:formData.codepostal,
             paysderesidence:formData.paysresidence,
             villederesidence:formData.villeresidence,
             quartierderesidence:formData.quartier,
             telephoneprimaire:formData.telephone,
             telephonesecondaire:formData.telephone1,
-            photoidentite:formData.photo,
+            photoidentite:imgSrc,
             niveauscolaire:formData.niveauscolaire,
             etatmatrimoniale:formData.statutmarital,
-            nombredeprotege:formData.nombrelative
+            nombredeprotege:nbreProtege,
+            centrenroll:userData.lieudemission
         })
         .select();
 
         // console.log(data);
+        // console.log(data[0].id);
         // console.log(user?.id);
   
         if(!error){
             setFormError(null);
-            navigate('/');
+            navigate(`/adherent/${data[0].id}/info`);
         }
       }catch (error){
         setFormError(error.message);
       }
-
     }
+
+    // const incrementWithTimeoutGood = () => setTimeout(() => setCount((oldCount) => oldCount + 1), 3000);
 
 
   return (
     <>
-    <Header />
+    <Header userprofile={userData} />
         <div className="container-xl p-5">
             <div className="container-fluid">
             <h1 className="page-title"> Nouveau Adhérent  </h1>
@@ -160,7 +178,7 @@ const AjoutAdherent = () => {
                             </div>
                             <div className="col-md-4">
                                 <label htmlFor="enrollocation" className="form-label"> Bureau d'enrollement: </label>
-                                <input type="text" className="form-control" name="enrollocation" id="enrollocation" value={userData.lieudemission} onChange={handleOnChange}  placeholder="Lieu/Bureau d'enrollement" disabled />
+                                <input type="text" className="form-control" name="enrollocation" id="enrollocation" value={userData.lieudemission} onChange={handleOnChange} placeholder="Lieu/Bureau d'enrollement" disabled />
                             </div>
                         </div>
 
@@ -196,33 +214,39 @@ const AjoutAdherent = () => {
                 
                             <div className="col-md-3">
                                 <label className="form-label"> Genre (Sexe) : <br/>
-                                <div className="form-check form-check-inline">
-                                    <input className="form-check-input" type="radio" name="genre" id="homme" value="homme" onChange={handleOnChange} required />
-                                    <label className="form-check-label" htmlFor="homme"> Homme </label>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <input className="form-check-input" type="radio" name="genre" id="femme" value="femme" onChange={handleOnChange} required />
-                                    <label className="form-check-label" htmlFor="femme"> Femme </label>
-                                </div>
+                                    <div className="form-check form-check-inline">
+                                        <input className="form-check-input" type="radio" name="genre" id="homme" value="Homme" onChange={handleOnChange} required />
+                                        <label className="form-check-label" htmlFor="homme"> Homme </label>
+                                    </div>
+                                    <div className="form-check form-check-inline">
+                                        <input className="form-check-input" type="radio" name="genre" id="femme" value="Femme" onChange={handleOnChange} required />
+                                        <label className="form-check-label" htmlFor="femme"> Femme </label>
+                                    </div>
                                 </label>
                             </div>
                 
                             <div className="col-md-6">
-                                <label htmlFor="pays" className="form-label"> Pays de naissance : <span className="text-body-secondary"></span></label>
+                                <label htmlFor="pays" className="form-label"> Pays de naissance : </label>
                                 <input type="text" className="form-control" name="pays" id="pays" placeholder="Pays de naissance" onChange={handleOnChange} />
                             </div>
                 
                             <div className="col-md-6">
-                                <label htmlFor="email" className="form-label">Email <span className="text-body-secondary"></span></label>
+                                <label htmlFor="email" className="form-label"> Email </label>
                                 <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} autoComplete="off" />
                                 <div className="invalid-feedback">L'adresse e-mail est obligatoire.</div>
                                 {/*{formError.email && <p>Ajouter une adresse email valide</p>} */}
                             </div>
                 
-                            <div className="col-md-12">
+                            <div className="col-md-9">
                                 <label htmlFor="adresse" className="form-label"> Adresse : </label>
                                 <input type="text" className="form-control" name="adresse" id="adresse" placeholder="01 bp 1010 Abidjan 05" onChange={handleOnChange} required />
                                 <div className="invalid-feedback">Une adresse postale est requise.</div>
+                            </div>
+
+                            <div className="col-md-3">
+                                <label htmlFor="codepostal" className="form-label"> Code postal : </label>
+                                <input type="number" className="form-control" name="codepostal" id="codepostal" placeholder="00225" onChange={handleOnChange} required />
+                                <div className="invalid-feedback">Le code postale est requise.</div>
                             </div>
                 
                             <div className="col-md-5">
@@ -266,7 +290,7 @@ const AjoutAdherent = () => {
                                 }
                             </div>
                         </div>
-            
+
                         <hr className="my-4" />
 
                         <div className="row">
@@ -358,14 +382,17 @@ const AjoutAdherent = () => {
                                     </div>
                                 </div>
                             </div>
-                
+
                             <hr className="my-4" />
                             <div className="col-md-12">
                                 <label htmlFor="nombrelative" className="form-label"> Nombre de protégé(s) : <span className="text-body-primary">(Optionel)</span></label>
-                                <input type="text" className="form-control" name="nombrelative" id="nombrelative" placeholder="Mettre 0 s'il n'y a personne" onChange={handleOnChange} />
+                                <input type="text" className="form-control" name="nombrelative" id="nombrelative" placeholder="Nombre d'enfant et d'epoux(se)" onChange={handleOnChange} />
+                                <small className=""> Les enfants comprennent tous les enfants biologiques, les enfants légalement adoptés, et les beaux-enfants célibataires et âgés de moins de 21 ans à la date d'inscription. 
+                                    Tous les enfants éligibles doivent etre inclus, même s'ils ne vivent pas avec vous ou s'ils n'ont pas l'intention de partir aux USA. Le fait de ne pas répertorier tous les enfants éligibles constitue un motif de disqualification. Tout enfant citoyen américain ou résident permanent légal, ne doit pas etre ajouté lors de l'inscription.
+                                </small>
                             </div>
                         </div>
-                        
+
                         <hr className="my-4" />                
                         <button className="w-30 btn btn-primary btn-lg" type="submit" onClick={handleSubmit}> Enregistrer </button>
                     </form>

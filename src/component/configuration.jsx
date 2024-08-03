@@ -171,7 +171,6 @@ const Configuration = ({userprofile}) => {
     }, []);
     
     const supprimBureau= async (localId) => {
-        console.log(localId);
         try {
           const { error } = await supabase.from('lieu_mission').delete().eq('id', localId);
     
@@ -190,27 +189,35 @@ const Configuration = ({userprofile}) => {
         <Header />
             <div className='content p-5'>
                 <h1 className='mb-5'>Configuration</h1>
+                <button type="button" class="btn btn-secondary"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title="This top tooltip is themed via CSS variables.">
+                Custom tooltip
+                </button>
 
                     {user?.id===userId ? (
                     <>
-                        <h3 className=''>Montant Adherent</h3>
+                        <h3 className=''>Montant Adherent <span className="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adherent principal."> &#9432;</span></h3>
                         <Stack direction="horizontal" gap={3} className='pb-5'>
                             <Form.Control className="me-auto" name='mtadherent' defaultValue={parametre.montant_adherent} onChange={(e) => setAdherent(e.target.value)} placeholder="Somme a payer pour l'adherent principal..." />
                             <Button variant="secondary" onClick={handleAdherent}>Enregistrer</Button>
                             <div className="vr" />
                             <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
-                        <small className="">Somme d'argent que devra payer l'adherent principal.</small>
                         </Stack>
+                        
+                            <div class="tooltip">&#9432;
+                                <span class="tooltiptext">Somme d'argent que devra payer l'adherent principal.</span>
+                            </div>
 
                         <hr/>
-                        <h3 className='mt-5'>Montant Relative</h3>
+                        <h3 className='mt-5'>Montant Relative <i className="bi-info-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adherent principal." title="Somme d'argent qui devra etre paye pour chaque protege."></i> </h3>
                         <Stack direction="horizontal" gap={3} className='pb-5'>
                             <Form.Control className="me-auto" name='mtrelative' defaultValue={parametre.montant_relative} onChange={(e) => setRelative(e.target.value)} placeholder="Somme a payer par protege ajoute..." />
                             <Button variant="secondary" onClick={handleRelative}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>                        
                         </Stack>
-                        <small className="">Somme d'argent qui devra etre paye pour chaque protege.</small>
 
                         <hr/>
                         <h3 className='mt-5'>Commision/Pourcentage Commercial</h3>
