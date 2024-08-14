@@ -8,39 +8,42 @@ import Footer from '../footer';
 import ProfileModal from './profile_modal';
 import background from '/src/assets/profilebg.jpg';
 import defaultAvatar from '/src/assets/avatar-profile.webp';
+import LoadingPage from './loading';
 
 const Profile = () => {
     const { user } = useAuth();
     const {userId} = useParams();
     const navigate = useNavigate();
-    const [profile, setProfile] = useState([]);
-    const [firstName, setFirstName] = useState();
-    const [prenoms, setPrenoms] = useState();
-    const [numPhone, setNumePhone] = useState();
-    const [newEmail, setNewEmail] = useState();
-    const [oldPassword, setOldPassword] = useState();
-    const [newPassword, setNewPassword] = useState();
-    const [confirmPass, setConfirmPass] = useState();
-    const [deletAccount, setDeletAccount] = useState();
+    const [profile, setProfile] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setPrenoms] = useState('');
+    const [numPhone, setNumePhone] = useState('');
+    const [newEmail, setNewEmail] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPass, setConfirmPass] = useState('');
+    const [deletAccount, setDeletAccount] = useState('');
     const [openModal, setOpenModal] = useState(false);
-    const [profilePhoto, setProfilePhoto] = useState();
+    const [profilePhoto, setProfilePhoto] = useState('');
+    const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState("");
 
-    useEffect(() => {
-        const userProfile = async () => {
-          try{
-            const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
-            
-            if(error){
-              throw new Error(error.message);
-            }
-            setProfile(data);
-            // setLoading(false);
+    const userProfile = async () => {
+        try{
+          const { data,error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+          
+          if(error){
+            throw new Error(error.message);
           }
-          catch(error){
-            console.log("Error: ", error);
-          }
+          setProfile(data);
+          setLoading(false);
         }
+        catch(error){
+          console.log("Error: ", error);
+        }
+    }
+
+    useEffect(() => {
         userProfile();
     }, [userId]);
 
@@ -59,7 +62,7 @@ const Profile = () => {
             .from('associates')
             .update({
                 nomdefamille: firstName,
-                prenoms: prenoms,
+                prenoms: lastName,
                 num_telephone: numPhone,
                 photodeprofil: profilePhoto,
                 email: newEmail,
@@ -69,9 +72,15 @@ const Profile = () => {
             .select();
 
             if(!error){
-                const { data, error } = await supabase.auth.updateUser({
+                await supabase.auth.updateUser({
                     email: newEmail
-                })
+                });
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Mise a jour`,
+                        note:`${user.email} a fait la mise a jour de ses informations...`
+                    });
             }
 
             window.location.reload();
@@ -102,7 +111,16 @@ const Profile = () => {
         try{
             const { data,error } = await supabase.auth.updateUser({
                 password: newPassword
-            })
+            });
+
+            if(!error){
+                await supabase
+                .from('dvenrollogs')
+                .insert({
+                    action:`Mise a jour`,
+                    note:`${user.email} a changé de mot de passe...`
+                })
+            }
         }
         catch(error){
             console.log(error.message);
@@ -115,22 +133,39 @@ const Profile = () => {
             const {dat,error} = await supabase
             .from('associates')
             .update({
-                status:0,
-                supp_intention:'TRUE'
+                status: false,
+                supp_intention: true
             })
             .eq('supp_code',deletAccount)
             .select();
-        navigate('/');
+
+            if(!error){
+                await supabase
+                .from('dvenrollogs')
+                .insert({
+                    action:`Suppression de compte`,
+                    note:`${user.email} souhaite supprimer son compte...`
+                });
+                navigate('/');
+            }
         }
         catch(error){
             console.log(error.message);
         }
     }
 
+    useEffect(() => {
+        const interval = setTimeout(() => setErrorMsg(""), 5000);
+        return () => clearTimeout(interval);
+    }, []);
 
+    if(loading){
+        return(<LoadingPage />);
+        }else{
     return (
     <>
-    <Header userprofile={profile} />
+    {/* <Header userprofile={profile} /> */}
+    <Header />
         <div className='content bg-secondary-soft'>
 
             <div className="rounded-top text-white d-flex flex-row" style={{backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundColor: "#000", height: "200px", marginBottom: "25px"}}>
@@ -175,9 +210,10 @@ const Profile = () => {
                         <Form.Label column sm="2"> Email </Form.Label>
                         <Col sm="10">
                             <Form.Control type="email" defaultValue={user?.email} onChange={(e) => setNewEmail(e.target.value)} />
+                            <Form.Control type="email" defaultValue={profile.email} onChange={(e) => setNewEmail(e.target.value)} />
                         </Col>
                     </Form.Group>
-                    <Button variant="primary" type="submit" onClick={majInfoPerso}>Enregistrer</Button>
+                    <Button variant="secondary" type="submit" onClick={majInfoPerso}>Enregistrer</Button>
                 </Form>
                 
                 <hr/>
@@ -203,7 +239,7 @@ const Profile = () => {
                         </Col>
                     </Form.Group>
 
-                    <Button variant="primary" type="submit" onClick={handlePassUpdate}>Enregistrer</Button>
+                    <Button variant="secondary" type="submit" onClick={handlePassUpdate}>Enregistrer</Button>
                 </Form>
 
                 <hr/>
@@ -221,7 +257,7 @@ const Profile = () => {
         </div>
     <Footer />
     </>
-  )
+  )}
 }
 
 export default Profile;

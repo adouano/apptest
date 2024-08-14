@@ -1,262 +1,199 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react';
+import {Button, Modal, Card, Alert} from 'react-bootstrap';
+import Cropper from 'react-easy-crop';
 
-const RhotoResizer = () => {
+const PhotoResizer = ({selectedPicture, currentPage, setCurrentPage, pictureAfter, setPictureAfter, picture, setPicture}) => {
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
-    // var resizeImage = function (e) {
-  const resizeImage = (e) => {
-    const file = e.target.files[0];
-    const maxSize = e.target.files[0].size;
-    const imageFilname = e.target.files[0].name;
-      console.log(maxSize);
+  const [imgSrc, setImgSrc] = useState(null);
+  const [adhPict, setAdhPict] = useState(null);
+  const [imgError, setImgError] = useState('');
+  const [crop, setCrop] = useState({x:0, y:0});
+  const [zoom, setZoom] = useState(1);
+  const [croppedArea, setCroppedArea] = useState(null);
+  const [aspectRatio, setAspectratio] = useState(1/1);
+  // const [picture, setPicture] = useState(null);
+  const inputRef = useRef();
 
-    const reader = new FileReader();
-    const img = new Image();
-    const canvas = document.createElement('canvas');
-    const dataURItoBlob = function (dataURI) {
-      const bytes = dataURI.split(',')[0].indexOf('base64') >= 0 ?
-          atob(dataURI.split(',')[1]) :
-          unescape(dataURI.split(',')[1]);
-          const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
-          const max = bytes.length;
-          const ia = new Uint8Array(max);
-      for (var i = 0; i < max; i++)
-          ia[i] = bytes.charCodeAt(i);
-      return new Blob([ia], { type: mime });
-    };
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files?.[0];
+  //   const imgType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  //   if(!file){
+  //       setImgError("Veuillez choisir une image...");
+  //       return;
+  //   }
+  //   if(!imgType.includes(file.type)){
+  //       setImgError("Extension d'image invalide");
+  //       return;
+  //   } 
+  //   const reader = new FileReader();
+  //   reader.addEventListener('load', () => {
+  //       const imageUrl = reader.result?.toString() || '' ;
+  //       setImgSrc(imageUrl);
+  //   });
+  //   reader.readAsDataURL(file);
+  // }
 
-    const resize = (e) => {
-      // const canvas = document.createElement('canvas');
-      // const ctx = canvas.getContext("2d");
-      // ctx.drawImage(img, 0, 0);
+  // const uploadpicture = (e) => {
+  //   if(e.target.files && e.target.files.length > 0){
+  //       const reader = new FileReader();
+  //       reader.readAsDataURL(e.target.files[0]);
+  //       reader.onload = function (e){
+  //           selectedPicture(reader.result);
+  //       }
+  //   }
+  // }
 
-      const maxWidth = 800;
-      const maxHeight = 800;
-      const width = img.width;
-      const height = img.height;
 
-      console.log(width);
-      console.log(height);
+//   const selectedPicture = (selectPict) => {
+//     setPicture(selectPict);
+//     setCurrentPage('crop-img');
+// }
 
-      if (width > height) {
-        if (width > maxWidth) {
-          height *= maxWidth / width;
-          width = maxWidth;
+const uploadpicture = (e) => {
+    const file = e.target.files;
+    if(file && file.length > 0){
+        const reader = new FileReader();
+        reader.readAsDataURL(file[0]);
+        reader.onload = function (e){
+            selectedPicture(reader.result);
         }
-      } else {
-        if (height > maxHeight) {
-          width *= maxHeight / height;
-          height = maxHeight;
-        }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-      ctx.canvas.toBlob((blob) => {
-        const file = new File([blob], imageFilname, {
-            type: imgType,
-            lastModified: Date.now()
-        });
-      }, imgType, 1);
-
-
-      // const width = image.width;
-      // const height = image.height;
-      if (width > height) {
-        if (width > maxSize) {
-          height *= maxSize / width;
-          width = maxSize;
-        }
-      } else {
-        if (height > maxSize) {
-          width *= maxSize / height;
-          height = maxSize;
-        }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      const dataUrl = canvas.toDataURL('image/jpeg');
-      return dataURItoBlob(dataUrl);
-    };
-
-    return new Promise(function (ok, no) {
-        if (!file.type.match(/image.*/)) {
-            no(new Error("Not an image"));
-            return;
-        }
-        reader.onload = async function (readerEvent) {
-            img.onload = function () { return ok(resize()); };
-            img.src = readerEvent.target.result;
-
-            const { data, error } = await supabase
-            .from('enrollperson').insert({
-              imgage_url:img.src,
-              other_date:img
-            });
-      };
-        reader.readAsDataURL(file);
-    });
-  };
-    const TestUpload = () => {
-        const {user, logout} = useAuth();
-        let userId = user?.id;
-        const [media, setMedia] = useState([]);
-        const [erreur, setErreur] = useState('');
-        const [numDossier, setNumDossier] = useState(0);
-        useEffect(() => {
-            const NumDossierAleatoire = () => {
-                return Math.floor(Math.random() * (99990 - 1 + 1)) + 1;
-            }
-            setNumDossier(NumDossierAleatoire());
-        }, []);
-        const enrolDossier = new Date().getFullYear()+'GC'+numDossier;
-        const imgType = ['image/jpeg', 'image/jpg', 'image/png'];
-    
-        
-    
-  const uploadImage = async(e) => {
-    const fileImg = e.target.files[0];
-    const extens = fileImg.type;
-    const imgs = new FileReader();
-
-    console.log(e.target.files);
-    
-    if(!imgType.includes(fileImg.type)){
-      return setErreur("Extension d'image invalide");
-    }  
-    
-
-    const { data, error } = await supabase
-      .storage
-      .from('medias')
-      // .upload(`${userId}/${file.name}`, file);
-      // .upload(`${userId}/public/${file.name}`, file);
-      .upload(`${userId}/${enrolDossier}-${fileImg.name}`, fileImg, {
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (data) {
-      getMedia();
-
-    } else {
-      console.log(error);
     }
-  }
-    }
-
-  return (
-    <>
-      <table id="tableMain">
-            <tbody>
-                <tr>
-					<td>
-						<h1> 
-						
-							<img id="icon_check" src="resources/icons/check.png" style="display: none;" className="message-status-icon" alt="Correct" />
-							<img id="icon_x" src="resources/icons/x.png" style="display: none;" className="message-status-icon" alt="In-correct" />
-							<label id="lblInstructions">Choose a Photo to Begin</label>
-						</h1>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<div id="imgWrapperDiv" className="crop-image-wrapper">
-							<canvas id="canvas" className="canvas-class" width="677" height="677"></canvas>
-							<img id="cropped_image" src="resources/images/no-photo.gif" style="display: none;" alt="Cropped image" />
-							<img id="tutorial_image" src="resources/images/tutorial.gif" style="display: none;" alt="Animated tutorial" />
-							<div id="divMessages" style="display: none;" className="message-div">
-								<br />
-                                <>
-								<table style="text-align:left;">
-									<tbody>
-                                        <tr>
-                                            <td><img id="errorMessageIcon" src="resources/icons/x.png" alt="Error Icon" /></td>
-                                            <td><h1 id="msgHeader"></h1></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><hr className="hr-divider" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><ul id="msgList"></ul></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                </>
-							</div>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td>
-                        <div id="compareToolbar" className="photo-toolbar btn-toolbar" role="toolbar">
-                            <div id="toolbar" className="toolbar-class" style="display: none;">
-                                <div className="btn-group" role="group" aria-label="Reset">
-                                    <input id="reset" type="image" src="resources/icons/iconReset.png" className="btn btn-default navbar-btn toolbar-button" title="Reset image" />
-                                </div>								
-                                <div className="btn-group" role="group" aria-label="Zoom">
-                                    <input id="zoomIn" type="image" src="resources/icons/iconZoomIn.png" className="btn btn-default navbar-btn toolbar-button" title="Zoom in" />
-                                    <input id="zoomOut" type="image" src="resources/icons/iconZoomOut.png" className="btn btn-default navbar-btn toolbar-button" title="Zoom out" />
-                                </div>
-                                <div className="btn-group eye-place-holder" role="group" aria-label="Eyes placeholder">
-                                    <img id="eyePlaceHolder" src="resources/icons/eyePlaceHolder.png" alt="Eyes placeholder" />
-                                    <img id="leftEyeMarker" src="resources/icons/eyeleft.png" alt="Left eye marker" className="item ui-draggable ui-draggable-handle" title="" style="display: none; position: absolute; width: 33px; height: 33px; inset: 15px auto auto 30px;" /> 
-                                    <img id="rightEyeMarker" src="resources/icons/eyeright.png" alt="Right eye marker" className="item ui-draggable ui-draggable-handle" title="" style="display: none; position: absolute; width: 33px; height: 33px; inset: 15px 30px auto auto;" />			
-                                </div>
-                                <div className="btn-group" role="group" aria-label="Rotate">
-                                    <input id="rotateLeft" type="image" src="resources/icons/iconRotateLeft.png" className="btn btn-default navbar-btn toolbar-button" title="Rotate left" />
-                                    <input id="rotateRight" type="image" src="resources/icons/iconRotateRight.png" className="btn btn-default navbar-btn toolbar-button" title="Rotate right" />
-                                </div>
-                                <div className="btn-group" role="group" aria-label="Tutorial">
-                                    <input id="btnTutorial" type="image" src="resources/icons/iconTutorial.png" className="btn btn-default navbar-btn toolbar-button" title="View Tutorial" />
-                                </div>								
-                            </div>
-                        </div>					
-					</td>
-                </tr>
-				<tr>
-					<td>
-						<div>
-							<form action="/photo/quality" enctype="multipart/form-data" method="post" tabindex="-1">
-								<input type="file" accept="image/jpeg" id="inputPhoto" name="imageData" className="upload" style="border:solid;border-color:red;display:none;" tabindex="-1" />
-							</form>
-								<button id="divFileUpload" className="fileUpload btn btn-primary btn-blue btn-xlarge" style="" title="Choose Photo">
-									<span className="glyphicon glyphicon-open"></span> 
-									<span id="spanChoosePhoto">Choose <br/>Photo</span> 
-								</button>
-							<button id="btnCheckQuality" type="submit" style="display: none;" className="btn btn-success btn-green btn-xlarge" title="Accept and Proceed">
-								Accept &amp; <br/>Proceed <span className="glyphicon glyphicon-ok-sign"></span>
-							</button>
-							<form id="frmSubmit" action="photo/submit" method="post">
-								<input type="hidden" id="txtSessionInfo" name="sessionInfo" value="" /> <input type="hidden" id="txtUrlOutParams" name="urlOutParams" />
-							</form>
-							<button id="btnSubmit" type="submit" style="display: none;" title="Submit and Proceed with Application" className="btn btn-success btn-green btn-xlarge">
-								Submit &amp; Proceed<br/>with Application <span className="glyphicon glyphicon-ok-sign"></span>
-							</button>
-							<button id="btnEditPhoto" style="display: none;" title="Crop Manually" className="btn btn-primary btn-med btn-danger">
-								<span className="glyphicon glyphicon-scissors"></span>&nbsp;Crop
-								<br/>Manually
-							</button>
-							<button id="btnHideTutorial" style="display: none;" title="Close Tutorial" className="btn btn-primary btn-med btn-danger">
-								<span className="glyphicon glyphicon-remove-sign"></span>&nbsp;Close
-								<br/>Tutorial
-							</button>
-						
-						</div>
-						<div>						
-							<a id="photoRequirementsUrl" style="" className="url-links" target="_blank" title="Photo Requirements" href="https://travel.state.gov/content/travel/en/passports/how-apply/photos.html"> Photo Requirements</a> 
-							<a id="cropped_image_link" tabindex="0" className="url-links" style="display: none;"> 
-								<img src="resources/icons/iconDownload.png" alt="Download Image" style="vertical-align: middle;" /> 
-								<span>&nbsp;Download image to your device</span>
-							</a>
-						</div>			
-					</td>
-				</tr>
-			</tbody>
-        </table>
-    </>
-  )
 }
 
-export default RhotoResizer;
+const choosePicture = () => {
+    inputRef.current.click();
+}
+
+const onCropDone = (imgCroppedArea) => {
+    const canvasEle = document.createElement("canvas");
+    canvasEle.width = 800;
+    canvasEle.height = 800;
+    const context = canvasEle.getContext("2d");
+
+    let imageObj1 = new Image();
+    imageObj1.src = picture;
+    imageObj1.onload = function(){
+        context.drawImage(
+            imageObj1,
+            imgCroppedArea.x,
+            imgCroppedArea.y,
+            imgCroppedArea.width,
+            imgCroppedArea.height,
+            0,
+            0,
+            800,
+            800);
+
+        const dataURL = canvasEle.toDataURL("image/jpeg");
+        setPictureAfter(dataURL);
+        setCurrentPage("cropped-img");
+    }
+}
+
+const onCropCancel = () => {
+    setCurrentPage("choose-img");
+    setPicture("");
+}
+
+const onCropComplete = (croppedAreaPercentage, croppedAreaPixels) => {
+    setCroppedArea(croppedAreaPixels);
+}
+
+  useEffect(() => {
+    const interval = setTimeout(() => setImgError(""), 5000);
+    return () => clearTimeout(interval);
+  }, [imgError]);
+
+  const updatPhoto = () => {}
+  return (
+    <>
+      <Button variant='btn btn-outline-warning text-body m-auto rounded-3 p-2 mb-5' onClick={(handleShow)}>Ajouter Photo</Button>
+
+      <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Ajouter une photo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {imgError && <Alert variant='danger'>{imgError}</Alert>}
+          <div className='col-md-12'>
+            {currentPage === "choose-img" ? (
+              <div className='d-flex flex-wrap justify-content-center croppedimg' onClick={choosePicture}>
+                {/* {picture ? (
+                    <img variant="top" src={picture} className='mb-3' />
+                ):(
+                    <img src='/src/assets/default-picture.jpg' alt='Defaut' className='mb-3' />
+                )} */}
+                <img src='/src/assets/default-picture.jpg' alt='Defaut' className='mb-3' />
+                <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+                <button className='btn btn-warning' onClick={choosePicture}>Choissir la photo</button>
+              </div>
+            ):(
+                currentPage === "crop-img" ? (
+                <>
+                    <div className='row'>
+                        <div className='cropper'>
+                            <div className='crop-container'>
+                                <Cropper
+                                    image={picture}
+                                    aspect={aspectRatio}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    onCropChange={setCrop}
+                                    onZoomChange={setZoom}
+                                    onCropComplete={onCropComplete}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="btn-container controls">
+                            <button className='btn btn-danger' onClick={onCropCancel}> Annuler </button>
+                            <button className='btn btn-success' onClick={() => onCropDone(croppedArea)}> Appliquer </button>
+                        </div>
+                    </div>
+                </>
+                ):(
+                <>
+                    <div className='croppedimg d-flex flex-wrap justify-content-center' onClick={choosePicture}>
+                        <img src={pictureAfter} className='cropped-img' />
+                        <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+                        <button className='btn btn-warning mt-3' onClick={choosePicture}>Changer la photo</button>
+                    </div>
+                </>
+                )
+            )}
+          </div>
+
+
+          
+
+
+
+          {/* <Card style={{ width: '100%' }}>
+            <Card.Body onClick={choosePicture}>
+              {imgSrc ? (
+                <Card.Img variant="top" src={imgSrc} className='mb-3' />
+              ):(
+                <Card.Img src='/src/assets/default-picture.jpg' alt='Defaut' className='mb-3' />
+              )}
+              <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+              <Button onClick={choosePicture}>Choissir l'image</Button>
+            </Card.Body>
+          </Card> */}
+
+
+        </Modal.Body>
+
+        {/* <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>X</Button>
+          <Button onClick={updatPhoto}> Ajouter </Button>
+        </Modal.Footer> */}
+        
+      </Modal>
+    </>
+  );
+}
+
+export default PhotoResizer;

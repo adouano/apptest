@@ -21,17 +21,52 @@ export const AuthProvider = ({ children }) => {
   }
 
   const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data,error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password
     });
+
+    if(!error){
+      await supabase
+      .from('dvenrollogs')
+      .insert({
+        action:'Connexion',
+        note:`${email} s'est connecté avec success...`
+      });
+    }
+
+    // try{
+    //   const { data,error } = await supabase
+    //     .from('dvenrollogs')
+    //     .insert({
+    //       action:'Connexion',
+    //       note:`${email} s'est connecté avec success...`
+    //     });
+
+    //   // const { data,error } = await supabase.from('associates').select().eq('email', email).single();
+    //   // const { data: { user } } = await supabase.auth.getUser();
+    //   // setProfile(user);
+    // }
+    // catch(error){
+    //   console.log('Error: ', error);
+    // }
   }
 
   const logout = async () => {
     const {error} = await supabase.auth.signOut();
-    setUser(null);
-    // navigate("/connexion");
-    window.location.reload();
+
+    if(!error){
+      await supabase
+        .from('dvenrollogs')
+        .insert({
+          action:'Déconnexion',
+          note:`${user.email} s'est déconnecté avec success...`
+        });
+
+      setUser(null);
+      // navigate("/connexion");
+      window.location.reload();
+    }
   }
 
   // const getUserId = async () => {
@@ -50,17 +85,15 @@ export const AuthProvider = ({ children }) => {
         }else if(session){
           setSession(session);
           setUser(session.user);
-          setGetUId(session.user.id);
           setisLoggedIn(true);
           // navigate("/");
         }
       }
     );     
   }
+
   useEffect(() => {
     getUserData();
-    // getUserId();
-  // }, [navigate, isLoggedIn]);
   }, []);
 
   const handleGoBack = () => {
@@ -68,7 +101,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout, isLoggedIn, handleGoBack, userError, getUId, profile }}>
+    <AuthContext.Provider value={{ user, register, login, logout, isLoggedIn, handleGoBack, userError, getUId }}>
       {children}
     </AuthContext.Provider>
   );

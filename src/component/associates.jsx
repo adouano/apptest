@@ -94,7 +94,7 @@ const Associates = () => {
         }else{
   return (
     <>
-    <div className="container-xl p-5">
+    <div className="container-xl pb-5 pt-5">
         <div className="row py-5 justify-content-center">
             <h1 className="panel-heading"> Liste d'associates - ({fetchAssoc.length}) <button className='float-end btn btn-dark' onClick={handleGoBack}><i className='bi-arrow-left-square'></i> Retour</button></h1>
             <input type='search' onChange={handleSearch} className='form-control' placeholder='Recherchez un partenaire...' />

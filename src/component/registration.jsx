@@ -7,22 +7,33 @@ import { Alert } from 'react-bootstrap';
 const AccountCreation = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
-    const [userData, setUserData] = useState({
-        nomfamille:"",
-        prenoms:"",
-        lieumission:"",
-        role:"",
-        telephone:"",
-        email:"",
-        password:"",
-        confirmpassword:"",
-        profilephoto:""
-    });
+    // const [userData, setUserData] = useState({
+    //     nomfamille:"",
+    //     prenoms:"",
+    //     lieumission:"",
+    //     role:"",
+    //     telephone:"",
+    //     email:"",
+    //     password:"",
+    //     confirmpassword:"",
+    //     profilephoto:""
+    // });
+
+    const [nomfamille, setNomfamille] = useState('');
+    const [prenoms, setPrenoms] = useState('');
+    const [lieumission, setLieumission] = useState('');
+    const [role, setRole] = useState('');
+    const [telephone, setTelephone] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmpassword, setConfirmpassword] = useState('');
+    const [profilePhoto, setProfilePhoto] = useState();
 
     const [userError, setUserError] = useState();
-    const [profilePhoto, setProfilePhoto] = useState();
+    
     const [imgSrc, setImgSrc] = useState('');
     const [mlocation, setMlocation] = useState([]);
+
     const [delCode, setDelCode] = useState(0);
     useEffect(() => {
         const NumAleatoire = () => {
@@ -34,7 +45,7 @@ const AccountCreation = () => {
     useEffect(() => {
         const fetchLocation = async() => {
             try{
-                const { data, error } = await supabase.from('lieu_mission').select();
+                const { data, error } = await supabase.from('dvlieumission').select();
                 
                 if(!error){
                     setMlocation(data);
@@ -56,79 +67,74 @@ const AccountCreation = () => {
     }, []);
     const userCode = new Date().getFullYear()+'GC'+numCode;
 
-    const handleOnChange = (e) => {
-        const {name,value,files} = e.target;
-        setUserData({...userData, [name]:value});
-
+    const fileChange = (e) => {
         const file = e.target.files?.[0];
         const imgType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if(!imgType.includes(file.type)){
             setUserError("Extension d'image invalide");
             return;
         } 
-        if(files){
+        if(file){
             const reader = new FileReader();
             reader.addEventListener('load', () => {
                 const imageUrl = reader.result?.toString() || '' ;
                 setImgSrc(imageUrl);
             });
             reader.readAsDataURL(file);
-            setProfilePhoto(URL.createObjectURL(files[0]));
+            setProfilePhoto(URL.createObjectURL(file));
         }        
     }
 
+    // // Verification email
+    useEffect(() => {
+        const emailVerify = async(email) => {
+            try{
+                // const { data, error } = await supabase.from('Users').select().eq('email',email).single();
+                const { data, error } = await supabase.from('associates').select().eq('email',email).single();
+    
+                console.log(data);
+    
+                if(data.email === email){
+                    setUserError("Cette adresse email est deja utilise....");
+                    return;
+                }
+                // setProfile(data);
+            }
+            catch(error){
+                console.log(error.message);
+                console.log('Erreur: ', error);
+            }
+        }
+        emailVerify();
+    }, [email]); 
+
     const handleSubmit = async(e) => {
-
-        console.log(imgSrc);
-        console.log(userData.profilephoto);
-
         e.preventDefault();
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-        if(!userData.nomfamille || !userData.prenoms || !userData.lieumission || !userData.role || !userData.telephone || !userData.email || !userData.password || !userData.confirmpassword){
+        if(!nomfamille || !prenoms || !lieumission || !role || !telephone || !email || !password || !confirmpassword){
             setUserError("Tous les champs sont obligatoires.");
             return;
         }
-        if(userData.password.length < 8){
+        if(password.length < 8){
             setUserError("Le mot de passe doit contenir 8 caracteres au moins.");
+            // fullNameLabel.classList.add('invalidInput');
             return;
         }
-        if(userData.password !== userData.confirmpassword){
+        if(password !== confirmpassword){
             setUserError("Les mots de passe doivent etre identique.");
             return;
         }
-        if(!regex.test(userData.email)){
+        if(!regex.test(email)){
             setUserError("Veuillez verifier le format de l'adresse email.");
             return;
         }
-
-        // const file = e.target.files?.[0];
-        // if(!imgType.includes(file.type)){
-        //     setUserError("Extension d'image invalide");
-        //     return;
-        // } 
-
-        // const reader = new FileReader();
-        // reader.addEventListener('load', () => {
-        //     const imageUrl = reader.result?.toString() || '' ;
-        //     setImgSrc(imageUrl);
-        // });
-        // reader.readAsDataURL(file);
-
-        // // Verification email
-        // useEffect(async () => {
-            // const { data, error } = await supabase
-            //     .from('Users')
-            //     .select('Email');
-            // console.log(data);
-        // }, []);        
         
-
         // Create user account
         try{
             // user auth
             const { data, error } = await supabase.auth.signUp({
-                email: userData.email,
-                password: userData.password
+                email: email,
+                password: password
             });
 
             //user public account
@@ -137,20 +143,32 @@ const AccountCreation = () => {
                 // const saveProfileImg = e.target.files[0];
                 // await supabase.storage
                 // .from('associatesimg')
-                // .upload(userId + '/' + getFullYear(), userData.profilephoto)
+                // .upload(userId + '/' + getFullYear(), profilephoto)
                 // .select();
+
+                // console.log(data.user);
+                // console.log(nomfamille);
+                // console.log(prenoms);
+                // console.log(lieumission);
+                // console.log(role);
+                // console.log(telephone);
+                // console.log(email);
+                // console.log(password);
+                // console.log(confirmpassword);
+                // console.log(profilePhoto);
+                // console.log(imgSrc);
 
                 await supabase
                 .from("associates")
                 .insert({
-                    associate_id: data.user.id,
-                    nomdefamille: userData.nomfamille,
-                    prenoms: userData.prenoms,
-                    lieudemission: userData.lieumission,
-                    role: userData.role,
-                    num_telephone: userData.telephone,
-                    photodeprofil: imgSrc,
-                    email:data.email,
+                    associate_id:data.user.id,
+                    nomdefamille:nomfamille,
+                    prenoms:prenoms,
+                    lieudemission:lieumission,
+                    role:role,
+                    num_telephone:telephone,
+                    photodeprofil:imgSrc,
+                    email:data.user.email,
                     status:'false',
                     supp_intention:'false',
                     supp_code:delCode
@@ -168,6 +186,11 @@ const AccountCreation = () => {
             setUserError(error.message);
         }
     }
+
+    useEffect(() => {
+        const interval = setTimeout(() => setUserError(""), 5000);
+        return () => clearTimeout(interval);
+    }, [userError]);
 
   return (
     <>
@@ -198,19 +221,19 @@ const AccountCreation = () => {
                                 <div className="row gy-3 gy-md-4 overflow-hidden">
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder='' onChange={handleOnChange} required />
+                                            <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder='' onChange={(e) => setNomfamille(e.target.value)} required />
                                             <label htmlFor='nomfamille'>Nom</label>
                                         </div>
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="text" className="form-control" name="prenoms" id="prenoms" placeholder='' onChange={handleOnChange} required />
+                                            <input type="text" className="form-control" name="prenoms" id="prenoms" placeholder='' onChange={(e) => setPrenoms(e.target.value)} required />
                                             <label htmlFor='prenoms'>Prenoms</label>
                                         </div>
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <select className="form-control form-select" name="lieumission" id="lieumission" placeholder='' onChange={handleOnChange} required>
+                                            <select className="form-control form-select" name="lieumission" id="lieumission" placeholder='' onChange={(e) => setLieumission(e.target.value)} required>
                                                 <option value=''>Choisez une ville</option>
                                                 {mlocation.map((lelocal, index) => (
                                                     <option key={lelocal.id} value={lelocal.libelle}>{lelocal.libelle}</option>
@@ -221,7 +244,7 @@ const AccountCreation = () => {
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <select className="form-control form-select" name="role" id="role" placeholder='' onChange={handleOnChange} required>
+                                            <select className="form-control form-select" name="role" id="role" placeholder='' onChange={(e) => setRole(e.target.value)} required>
                                                 <option value="">Groupe de travail</option>
                                                 <option value="agent">Commercial</option>
                                                 <option value="admin">Administrateur</option>
@@ -233,31 +256,31 @@ const AccountCreation = () => {
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="text" className="form-control" name="telephone" id="telephone" placeholder='' maxLength="10" onChange={handleOnChange} required />
+                                            <input type="text" className="form-control" name="telephone" id="telephone" placeholder='' maxLength="10" onChange={(e) => setTelephone(e.target.value)} required />
                                             <label htmlFor='telephone'>Telephone</label>
                                         </div>
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="email" className="form-control" name="email" id="email" placeholder='' onChange={handleOnChange} autoComplete="off" required />
+                                            <input type="email" className="form-control" name="email" id="email" placeholder='' onChange={(e) => setEmail(e.target.value)} autoComplete="off" required />
                                             <label htmlFor='email'>Votre adresse email</label>
                                         </div>
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="password" className="form-control" name="password" id="password" minLength="8" placeholder='' onChange={handleOnChange} required />
+                                            <input type="password" className="form-control" name="password" id="password" minLength="8" placeholder='' onChange={(e) => setPassword(e.target.value)} required />
                                             <label htmlFor='password'>Mot de passe</label>
                                         </div>
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="password" className="form-control" name="confirmpassword" id="confirmpassword" minLength="8" placeholder='' onChange={handleOnChange} required />
+                                            <input type="password" className="form-control" name="confirmpassword" id="confirmpassword" minLength="8" placeholder='' onChange={(e) => setConfirmpassword(e.target.value)} required />
                                             <label htmlFor='confirmpassword'>Confirmer mot de passe</label>
                                         </div>
                                     </div>
                                     <div className="input-group mb-3">
                                         <div className="form-floating">
-                                            <input type="file" className="form-control" name="saveProfileImg" accept='image/jpg, image/jpeg, image/png, image/webp' id="profilephoto" placeholder='' onChange={handleOnChange} required />
+                                            <input type="file" className="form-control" name="saveProfileImg" accept='image/jpg, image/jpeg, image/png, image/webp' id="profilephoto" placeholder='' onChange={fileChange} required />
                                             <label htmlFor='profilephoto'>Photo de profil</label>
                                         </div>
                                         <div className="col-md-12 mt-2 d-flex justify-content-center">

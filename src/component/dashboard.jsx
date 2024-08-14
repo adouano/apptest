@@ -22,31 +22,34 @@ const Dashboard = () => {
   const [profile, setProfile] = useState('');
   const [loading, setLoading] = useState(true);
   let userId = user?.id;
-
-  const userProfile = async () => {
-    try{
-      const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
-      
-      if(error){
-        throw new Error(error.message);
-      }
-      setProfile(data);
-      setLoading(false);
-    }
-    catch(error){
-      console.log("Error: ", error);
-    }
-  }
+    // let userId = '1aa70dfb-c770-4f2c-a163-4b567dffec67';
+    // console.log(user?.id);
+    // console.log(userId);
 
   useEffect(() => {
-    userProfile();
+    const userProfile = async () => {
+      try{
+        const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+        
+        if(error){
+          throw new Error(error.message);
+        }
+        setProfile(data);
+        setLoading(false);
+      }
+      catch(error){
+        console.log("Error: ", error);
+      }
+    }
+    userProfile(userId);
   }, [userId]);
 
   return (
     user?.id !== undefined && profile?.status !== '0' ? (
       <>
-      {/* <TestUpload /> */}
-        <Header userprofile={profile} />
+      {/* <TestUpload />
+        <Header userprofile={profile} /> */}
+        <Header />
           {profile?.role === "admin" && <Administrator key={profile.associate_id} userprofile={profile} />}
           {profile?.role === "supervisor" && <Superviseur key={profile.associate_id} userprofile={profile} />}
           {profile?.role === "finance" && <Caissiere key={profile.associate_id} userprofile={profile} />}

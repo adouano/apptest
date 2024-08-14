@@ -113,7 +113,7 @@ const Commercial = ({userprofile}) => {
             </header>
 
             
-            <div className="container-xl p-5">
+            <div className="container-xl pb-5 pt-5">
                 {fetchData.length > 0 ? (
                 <>
                 <div className="row gx-5">

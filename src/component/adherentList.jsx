@@ -25,25 +25,25 @@ const AdherentList = ({adherents,userprofile}) => {
                 <tbody className="">
                     {adherents.map((adherent) => (
                         <tr key={adherent.id}>
-                            <th className={adherent.numerodvlottery !== null ? ('text-bg-success'):(<></>)} scope="row">{adherent.numerodossier}</th>
-                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):(<></>)}><img src={adherent.photoidentite} alt={adherent.nomdefamille} className="imgprofile" />{adherent.nomdefamille}</td>
-                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):(<></>)}> {adherent.prenomdefamille}</td>
-                            <td> {adherent.genresexe}</td>
-                            <td> {adherent.villederesidence} </td>
-                            <td> {adherent.paysdenaissance} </td>
-                            <td> {adherent.telephoneprimaire} </td>
-                            <td className="d-flex gap-2">
+                            <th className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')} scope="row">{adherent.numerodvlottery !== null ? adherent.numerodvlottery:adherent.numerodossier}</th>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}><img src={adherent.photoidentite} alt={adherent.nomdefamille} className="imgprofile" />{adherent.nomdefamille}</td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.prenomdefamille}</td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.genresexe}</td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.villederesidence} </td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.paysdenaissance} </td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.telephoneprimaire} </td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('d-flex gap-2')}>
                                 <Link to={`/adherent/${adherent.id}/info`}>
                                     <button className="btn btn-success bg-gradient">Infos</button>
                                 </Link>
                                 {adherent.numerodvlottery === null ? (
                                     <>
                                     <Link to={`/adherent/${adherent.id}/modifier`}>
-                                        <button className="btn btn-warning bg-gradient">Modifier</button>
+                                        <button className="btn btn-warning bg-gradient"><i className="bi bi-pencil-square"></i></button>
                                     </Link>
-                                    <a type="button" className="btn btn-danger bg-gradient" href="">Supprimer</a>
+                                    <a type="button" className="btn btn-danger bg-gradient" href=""><i className="bi bi-trash3-fill"></i></a>
                                     </>
-                                ):(<>{adherent.numerodvlottery }</>)}
+                                ):(<></>)}
                             </td>
                         </tr>
                     ))}
@@ -56,14 +56,14 @@ const AdherentList = ({adherents,userprofile}) => {
                     adherent?.centrenroll === userprofile?.lieudemission ? 
                     (
                         <tr key={adherent.id}>
-                            <th className={adherent.numerodvlottery !== null ? ('text-bg-success'):(<></>)} scope="row">{adherent.numerodossier}</th>
-                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):(<></>)}><img src={adherent.photoidentite} alt={adherent.nomdefamille} className="imgprofile" />{adherent.nomdefamille}</td>
-                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):(<></>)}> {adherent.prenomdefamille}</td>
-                            <td> {adherent.genresexe}</td>
-                            <td> {adherent.villederesidence} </td>
-                            <td> {adherent.paysdenaissance} </td>
-                            <td> {adherent.telephoneprimaire} </td>
-                            <td className="d-flex gap-2">
+                            <th className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')} scope="row">{adherent.numerodvlottery !== null ? adherent.numerodvlottery:adherent.numerodossier}</th>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}><img src={adherent.photoidentite} alt={adherent.nomdefamille} className="imgprofile" />{adherent.nomdefamille}</td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.prenomdefamille}</td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.genresexe}</td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.villederesidence} </td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.paysdenaissance} </td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('')}> {adherent.telephoneprimaire} </td>
+                            <td className={adherent.numerodvlottery !== null ? ('text-bg-success'):('d-flex gap-2')}>
                                 <Link to={`/adherent/${adherent.id}/info`}>
                                     <button className="btn btn-success bg-gradient">Infos</button>
                                 </Link>
@@ -74,13 +74,12 @@ const AdherentList = ({adherents,userprofile}) => {
                                     ):(
                                     <>
                                         <Link to={`/adherent/${adherent.id}/modifier`}>
-                                            <button className="btn btn-warning bg-gradient">Modifier</button>
+                                            <button className="btn btn-warning bg-gradient"><i className="bi bi-pencil-square"></i></button>
                                         </Link>
-                                        <a type="button" className="btn btn-danger bg-gradient" href="">Supprimer</a>
+                                        <a type="button" className="btn btn-danger bg-gradient" href=""><i className="bi bi-trash3-fill"></i></a>
                                     </>
                                     )
-                                    
-                                ):(<>{adherent.numerodvlottery }</>)}                        
+                                ):(<></>)}                        
                             </td>
                         </tr>
                     ):(<></>)                

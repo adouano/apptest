@@ -6,6 +6,7 @@ import LoadingPage from "./loading";
 import AdherentList from "./adherentList";
 import Pagination from "./pagination";
 import ModalInfoAgent from './modal_agent';
+import StatistiquesGraph from './statGraph';
 
 const Administrator = ({userprofile}) => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Administrator = ({userprofile}) => {
     const [fetchError, setFetchError] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [personPerPage, setPersonPerPage] = useState(7);
+    const [personPerPage, setPersonPerPage] = useState(9);
 
     let userId = user.id;
 
@@ -27,7 +28,7 @@ const Administrator = ({userprofile}) => {
 
     const fetchPersons = async () => {
         try{
-            const {data,error} = await supabase.from('dvenrollment').select(`*, dvrelatives(*)`).order('created_at', { ascending: true });
+            const {data,error} = await supabase.from('dvenrollment').select(`*, dvrelatives(*), dvtransaction(*)`).order('created_at', { ascending: true });
     
             if(error){
                 throw new Error("Could not fetch data.");
@@ -90,11 +91,7 @@ const Administrator = ({userprofile}) => {
     const date = new Date();
     const hour = date.getHours();
     let todayDate = new Date().toDateString();
-    // let todayDate = new Date().toLocaleDateString();
-
-    // console.log(searchFilter);  stat-chart
-
-	
+    // let todayDate = new Date().toLocaleDateString();	
 
     if(loading){
       return(<LoadingPage />);
@@ -119,9 +116,9 @@ const Administrator = ({userprofile}) => {
                     </div>
                 </header>
 
-            <div className="container-xl p-5">
+            <div className="container-xl pb-5 pt-5">
                 <div className="row gx-5">
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-primary border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -141,7 +138,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-warning border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -161,7 +158,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-secondary border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -181,7 +178,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-info border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -201,7 +198,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-dark border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -221,7 +218,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-light border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -241,7 +238,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-success border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -261,7 +258,7 @@ const Administrator = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-danger border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -290,8 +287,8 @@ const Administrator = ({userprofile}) => {
                                 <h4 className=""> Agents Commercials </h4>
                             </div>
                             {fetchAssoc.map((associat) => (
-                            <>
-                                <div className="p-2" key={associat.id}>
+                            <div key={associat.id}>
+                                <div className="p-2">
                                     <div className="card-body">
                                         {/* <svg className="bd-placeholder-img rounded-circle" width="120" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg> */}
                                         <div className='d-flex'>
@@ -310,7 +307,7 @@ const Administrator = ({userprofile}) => {
                                     </div>
                                 </div>
                                 <hr className="my-2" />
-                            </>
+                            </div>
                             ))}
                             <div className='p-2'>
                                 <div className='card-body text-center'><a href="/associates">Tous les partenaires <i className="bi-caret-right-fill" aria-hidden="true"></i> </a></div>
@@ -322,7 +319,7 @@ const Administrator = ({userprofile}) => {
                         <div className="card mb-5">
                             <div className="card-header border-0">
                                 <div className="d-flex justify-content-between">
-                                    <h3 className="card-title">Sales</h3>
+                                    <h3 className="card-title">Statistiques</h3>
                                     <a href="#">View Report</a>
                                 </div>
                             </div>
@@ -347,18 +344,20 @@ const Administrator = ({userprofile}) => {
                                             <div className=""></div>
                                         </div>
                                     </div>
-                                    <canvas id="stat-chart" height="400" width="1014" className="chartjs-render-monitor"></canvas>
+                                    <canvas id="stat-chart" height="400" width="500" className="chartjs-render-monitor"></canvas>
                                 </div>
                                 <div className="d-flex flex-row justify-content-end">
                                     <span className="mr-2"><i className="bi-square text-primary"></i> This year</span>
                                     <span><i className="bi-square text-gray"></i> Last year</span>
                                 </div>
+
+                                {/* <StatistiquesGraph adherents={fetchData} /> */}
                             </div>
                         </div>
 
                         <div className="card">
                             <div className="card-header border-0">
-                                <h3 className="card-title">Online Store Overview</h3>
+                                <h3 className="card-title"> Vue d'ensemble </h3>
                                 <div className="card-tools">
                                     <a href="#" className="btn btn-sm btn-tool"><i className="bi-download"></i></a>
                                     <a href="#" className="btn btn-sm btn-tool"><i className="bi-bars"></i></a>

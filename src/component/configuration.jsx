@@ -37,7 +37,7 @@ const Configuration = ({userprofile}) => {
                 if(error){
                     throw new Error(error.message);
                 }
-            setParametre(data);
+                setParametre(data);
             }
             catch(error){
                 console.log(error.message);
@@ -55,7 +55,16 @@ const Configuration = ({userprofile}) => {
                 .from('configurations')
                 .update({ montant_adherent: adherent })
                 .eq('id', 1);
-            setAdherent(data);
+
+            if(!error){
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Modification de contribution d'adhésion`,
+                        note:`${user.email} a modifié le motant (${adherent}) de soucription de l'adhérent principal...`
+                    });
+                setAdherent(data);
+            }
         }
         catch(error){
             console.log(error.message);
@@ -70,7 +79,16 @@ const Configuration = ({userprofile}) => {
                 .from('configurations')
                 .update({ montant_relative: relative })
                 .eq('id', 1);
-            setRelative(data);
+
+            if(!error){
+                await supabase
+                .from('dvenrollogs')
+                .insert({
+                    action:`Modification de contribution du protégé`,
+                    note:`${user.email} a modifié le motant (${relative}) de soucription du protégé...`
+                });
+                setRelative(data);
+            }
         }
         catch(error){
             console.log(error.message);
@@ -85,7 +103,16 @@ const Configuration = ({userprofile}) => {
                 .from('configurations')
                 .update({ bonus_commercial: bonusCcl })
                 .eq('id', 1);
-            setBonusCcl(data);
+
+            if(!error){
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Modification de bonus`,
+                        note:`${user.email} a modifié le pourcentage (${bonusCcl}) bonus du commercial...`
+                    });
+                setBonusCcl(data);
+            }
         }
         catch(error){
             console.log(error.message);
@@ -98,7 +125,16 @@ const Configuration = ({userprofile}) => {
                 .from('configurations')
                 .update({ bonus_finance: bonusFinance })
                 .eq('id', 1);
-            setBonusFinance(data);
+
+            if(!error){
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Modification de bonus`,
+                        note:`${user.email} a modifié le pourcentage (${bonusFinance}) bonus du caissier/caissiere...`
+                    });
+                setBonusFinance(data);
+            }
         }
         catch(error){
             console.log(error.message);
@@ -111,7 +147,16 @@ const Configuration = ({userprofile}) => {
                 .from('configurations')
                 .update({ bonus_supervisor: bonusSupervisor })
                 .eq('id', 1);
-            setBonusSupervisor(data);
+
+            if(!error){
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Modification de bonus`,
+                        note:`${user.email} a modifié le pourcentage (${bonusSupervisor}) bonus du superviseur...`
+                    });
+                setBonusSupervisor(data);
+            }
         }
         catch(error){
             console.log(error.message);
@@ -124,7 +169,16 @@ const Configuration = ({userprofile}) => {
                 .from('configurations')
                 .update({ bonus_informaticien: bonusInfo })
                 .eq('id', 1);
-            setBonusInfo(data);
+
+            if(!error){
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Modification de bonus`,
+                        note:`${user.email} a modifié le pourcentage (${bonusInfo}) bonus de l'informaticien...`
+                    });
+                setBonusInfo(data);
+            }
         }
         catch(error){
             console.log(error.message);
@@ -140,7 +194,7 @@ const Configuration = ({userprofile}) => {
         }
         try{
             const { data, error } = await supabase
-                .from('lieu_mission')
+                .from('dvlieumission')
                 .insert({ libelle: bureau, description: descripBureau})
                 .select();
 
@@ -148,7 +202,16 @@ const Configuration = ({userprofile}) => {
                 //     setMlocation(data);
                 // }
 
-            window.location.reload();
+            if(!error){
+                await supabase
+                    .from('dvenrollogs')
+                    .insert({
+                        action:`Ajout de lieu d'enrollement`,
+                        note:`${user.email} a ajouté un nouveau local (${bureau}) d'enrollement...`
+                    });
+                setBonusInfo(data);
+                window.location.reload();
+            }
         }
         catch(error){
             console.log(error.message);
@@ -157,7 +220,7 @@ const Configuration = ({userprofile}) => {
     useEffect(() => {
         const fetchLocation = async() => {
             try{
-                const { data, error } = await supabase.from('lieu_mission').select();
+                const { data, error } = await supabase.from('dvlieumission').select();
                 
                 if(!error){
                     setMlocation(data);
@@ -169,12 +232,19 @@ const Configuration = ({userprofile}) => {
         }
         fetchLocation();
     }, []);
-    
-    const supprimBureau= async (localId) => {
+
+    const supprimBureau= async (localId,elocal) => {
         try {
-          const { error } = await supabase.from('lieu_mission').delete().eq('id', localId);
+          const { error } = await supabase.from('dvlieumission').delete().eq('id', localId);
     
-          if (error) {
+        if(!error){
+            await supabase
+                .from('dvenrollogs')
+                .insert({
+                    action:`Suppression de centre d'enrollement`,
+                    note:`${user.email} a supprimé le local (${elocal}) d'enrollement...`
+                });
+        }else{
             throw new Error("Impossible de supprimer...");
           }         
           setMlocation(mlocation.filter((lelocal) => lelocal.id !== localId));
@@ -189,13 +259,6 @@ const Configuration = ({userprofile}) => {
         <Header />
             <div className='content p-5'>
                 <h1 className='mb-5'>Configuration</h1>
-                <button type="button" class="btn btn-secondary"
-                        data-bs-toggle="tooltip" data-bs-placement="top"
-                        data-bs-custom-class="custom-tooltip"
-                        data-bs-title="This top tooltip is themed via CSS variables.">
-                Custom tooltip
-                </button>
-
                     {user?.id===userId ? (
                     <>
                         <h3 className=''>Montant Adherent <span className="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adherent principal."> &#9432;</span></h3>
@@ -206,8 +269,8 @@ const Configuration = ({userprofile}) => {
                             <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
                         </Stack>
                         
-                            <div class="tooltip">&#9432;
-                                <span class="tooltiptext">Somme d'argent que devra payer l'adherent principal.</span>
+                            <div className="tooltip">&#9432;
+                                <span className="tooltiptext">Somme d'argent que devra payer l'adherent principal.</span>
                             </div>
 
                         <hr/>
@@ -280,7 +343,7 @@ const Configuration = ({userprofile}) => {
                                     <div className="card-body">
                                         <Stack direction="horizontal" gap={1}>
                                             <h5 className="card-title" aria-describedby="description" title={lelocal.description}>{lelocal.libelle}</h5>
-                                            <button className="btn btn-danger" onClick={() => supprimBureau(lelocal.id)}>X</button>
+                                            <button className="btn btn-danger" onClick={() => supprimBureau(lelocal.id,lelocal.libelle)}>X</button>
                                         </Stack>
                                     </div>
                                 </div>

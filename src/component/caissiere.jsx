@@ -91,9 +91,9 @@ const Caissiere = ({userprofile}) => {
             </div>
         </header>
 
-        <div className="container-xl p-5">
+        <div className="container-xl pb-5 pt-5">
             <div className="row gx-5">
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-primary border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -113,7 +113,7 @@ const Caissiere = ({userprofile}) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-warning border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -133,7 +133,7 @@ const Caissiere = ({userprofile}) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-secondary border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -153,7 +153,7 @@ const Caissiere = ({userprofile}) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-xxl-3 col-md-6 mb-5">
+                <div className="col-xxl-3 col-md-3 mb-5">
                     <div className="card card-raised border-start border-info border-4">
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">

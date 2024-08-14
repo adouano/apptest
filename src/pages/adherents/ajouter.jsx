@@ -1,15 +1,17 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import supabase from '../../config/dbConfig';
 import { useAuth }  from '../../config/userContext';
 import {Link, useNavigate} from 'react-router-dom';
 import { Alert } from 'react-bootstrap';
+import Cropper from 'react-easy-crop';
 
 import Footer from '/src/footer';
 import Header from '/src/header';
 
 const AjoutAdherent = () => {
-    const { user, getUId } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
+    const inputRef = useRef();
     const [formData, setFormData] = useState({
         numdvlottery:"",
         numdossier:"",
@@ -28,13 +30,20 @@ const AjoutAdherent = () => {
         telephone1:"",
         photo:"",
         niveauscolaire:"",
-        statutmarital:"",
-        nombrelative:""
+        statutmarital:""
     });
-    const [formError, setFormError] = useState();
-    const [profilePhoto, setProfilePhoto] = useState();
+    const [formError, setFormError] = useState(null);
+    const [profilePhoto, setProfilePhoto] = useState('');
     const [userData, setUserData] = useState('');
     const [imgSrc, setImgSrc] = useState('');
+    // const [adhPict, setAdhPict] = useState(null);
+    const [picture, setPicture] = useState(null);
+    const [crop, setCrop] = useState({x:0, y:0});
+    const [zoom, setZoom] = useState(1);
+    const [croppedArea, setCroppedArea] = useState(null);
+    const [aspectRatio, setAspectratio] = useState(1/1);
+    const [pictureAfter, setPictureAfter] = useState('');
+    const [currentPage, setCurrentPage] = useState('choose-img');
     let userId = user?.id;
 
     const [numDossier, setNumDossier] = useState(0);
@@ -49,7 +58,7 @@ const AjoutAdherent = () => {
 
     const fetchUser = async() => {
         try{
-            const { data, error } = await supabase.from('associates').select().eq('associate_id', userId).single();
+            const { data, error } = await supabase.from('associates').select().eq('associate_id', user?.id).single();
 
             if(error){
                 throw new Error(error.message);
@@ -61,32 +70,77 @@ const AjoutAdherent = () => {
         }
     }
     useEffect(() => {
-        fetchUser();
+        fetchUser(userId);
     }, [userId]);
 
     const handleOnChange = (e) => {
-        const {name,value,files} = e.target;
+        const {name,value} = e.target;
         setFormData({...formData, [name]:value});
+    }
 
-        const file = e.target.files?.[0];
-        const imgType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if(!imgType.includes(file.type)){
-            setFormError("Extension d'image invalide");
-            return;
-        } 
-        if(files){
+    const selectedPicture = (selectPict) => {
+        setPicture(selectPict);
+        setCurrentPage('crop-img');
+    }
+
+    const uploadpicture = (e) => {
+        const file = e.target.files;
+        if(file && file.length > 0){
             const reader = new FileReader();
-            reader.addEventListener('load', () => {
-                const imageUrl = reader.result?.toString() || '' ;
-                setImgSrc(imageUrl);
-            });
-            reader.readAsDataURL(file);
-            setProfilePhoto(URL.createObjectURL(files[0]));
-        }        
+            reader.readAsDataURL(file[0]);
+            reader.onload = function (e){
+                selectedPicture(reader.result);
+            }
+        }
+    }
+
+    const choosePicture = () => {
+        inputRef.current.click();
+    }
+
+    const onCropDone = (imgCroppedArea) => {
+        const canvasEle = document.createElement("canvas");
+        canvasEle.width = 800;
+        canvasEle.height = 800;
+        const context = canvasEle.getContext("2d");
+
+        let imageObj1 = new Image();
+        imageObj1.src = picture;
+        imageObj1.onload = function(){
+            context.drawImage(
+                imageObj1,
+                imgCroppedArea.x,
+                imgCroppedArea.y,
+                imgCroppedArea.width,
+                imgCroppedArea.height,
+                0,
+                0,
+                800,
+                800);
+
+            const dataURL = canvasEle.toDataURL("image/jpeg");
+            setPictureAfter(dataURL);
+            setCurrentPage("cropped-img");
+        }
+    }
+
+    const onCropCancel = () => {
+        setCurrentPage("choose-img");
+        setPicture("");
+    }
+
+    const onCropComplete = (croppedAreaPercentage, croppedAreaPixels) => {
+        setCroppedArea(croppedAreaPixels);
+    }
+    
+    const onAspectRatioChange = (e) => {
+        setAspectratio(e.target.value);
     }
 
     const handleSubmit = async (e) => {
-        // console.log(formData);
+        console.log(pictureAfter);
+        console.log(formData);
+
         e.preventDefault();
         let nbreProtege = 0;
        // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -132,10 +186,9 @@ const AjoutAdherent = () => {
             quartierderesidence:formData.quartier,
             telephoneprimaire:formData.telephone,
             telephonesecondaire:formData.telephone1,
-            photoidentite:imgSrc,
+            photoidentite:pictureAfter,
             niveauscolaire:formData.niveauscolaire,
             etatmatrimoniale:formData.statutmarital,
-            nombredeprotege:nbreProtege,
             centrenroll:userData.lieudemission
         })
         .select();
@@ -145,6 +198,13 @@ const AjoutAdherent = () => {
         // console.log(user?.id);
   
         if(!error){
+            await supabase
+                .from('dvenrollogs')
+                .insert({
+                action:`Ajout d'adherent`,
+                note:`${user.email} a ajouté ${data[0].id}...`
+            });
+
             setFormError(null);
             navigate(`/adherent/${data[0].id}/info`);
         }
@@ -153,13 +213,10 @@ const AjoutAdherent = () => {
       }
     }
 
-    // const incrementWithTimeoutGood = () => setTimeout(() => setCount((oldCount) => oldCount + 1), 3000);
-
-
   return (
     <>
     <Header userprofile={userData} />
-        <div className="container-xl p-5">
+        <div className="container-xl pb-5 pt-5">
             <div className="container-fluid">
             <h1 className="page-title"> Nouveau Adhérent  </h1>
             <div className="col-md-12 col-lg-12">
@@ -170,19 +227,19 @@ const AjoutAdherent = () => {
                         <div className='row mb-3'>
                             <div className="col-md-4">
                                 <label htmlFor="numdossier" className="form-label"> Numero de Dossier : </label>
-                                <input type="text" className="form-control" name="numdossier" id="numdossier" value={enrolDossier} onChange={handleOnChange} disabled />
+                                <input type="text" className="form-control" name="numdossier" id="numdossier" defaultValue={enrolDossier} onChange={handleOnChange} disabled />
                             </div>
                             <div className="col-md-4">
                                 <label htmlFor="numdvlottery" className="form-label"> Numero DV Lottery : </label>
-                                <input type="text" className="form-control" name="numdvlottery" id="numdvlottery" value="" placeholder="Numero de confirmation DV Lottery" disabled />
+                                <input type="text" className="form-control" name="numdvlottery" id="numdvlottery" placeholder="Numero de confirmation DV Lottery" disabled />
                             </div>
                             <div className="col-md-4">
                                 <label htmlFor="enrollocation" className="form-label"> Bureau d'enrollement: </label>
-                                <input type="text" className="form-control" name="enrollocation" id="enrollocation" value={userData.lieudemission} onChange={handleOnChange} placeholder="Lieu/Bureau d'enrollement" disabled />
+                                <input type="text" className="form-control" name="enrollocation" id="enrollocation" defaultValue={userData.lieudemission} onChange={handleOnChange} placeholder="Lieu/Bureau d'enrollement" disabled />
                             </div>
                         </div>
 
-                        <div className="row g-3">
+                        <div className="row g-3 mb-3">
                             <div className="col-md-5">
                                 <label htmlFor="nomfamille" className="form-label"> Nom : </label>
                                 <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder="Komenan" onChange={handleOnChange} required />
@@ -224,70 +281,127 @@ const AjoutAdherent = () => {
                                     </div>
                                 </label>
                             </div>
-                
-                            <div className="col-md-6">
-                                <label htmlFor="pays" className="form-label"> Pays de naissance : </label>
-                                <input type="text" className="form-control" name="pays" id="pays" placeholder="Pays de naissance" onChange={handleOnChange} />
-                            </div>
-                
-                            <div className="col-md-6">
-                                <label htmlFor="email" className="form-label"> Email </label>
-                                <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} autoComplete="off" />
-                                <div className="invalid-feedback">L'adresse e-mail est obligatoire.</div>
-                                {/*{formError.email && <p>Ajouter une adresse email valide</p>} */}
-                            </div>
-                
-                            <div className="col-md-9">
-                                <label htmlFor="adresse" className="form-label"> Adresse : </label>
-                                <input type="text" className="form-control" name="adresse" id="adresse" placeholder="01 bp 1010 Abidjan 05" onChange={handleOnChange} required />
-                                <div className="invalid-feedback">Une adresse postale est requise.</div>
-                            </div>
+                        </div>
 
-                            <div className="col-md-3">
-                                <label htmlFor="codepostal" className="form-label"> Code postal : </label>
-                                <input type="number" className="form-control" name="codepostal" id="codepostal" placeholder="00225" onChange={handleOnChange} required />
-                                <div className="invalid-feedback">Le code postale est requise.</div>
+                        <div className="row g-3">
+                            <div className='col-md-8'>
+                                <div className="row g-3">
+                                    <div className="col-md-6">
+                                        <label htmlFor="pays" className="form-label"> Pays de naissance : </label>
+                                        <input type="text" className="form-control" name="pays" id="pays" placeholder="Pays de naissance" onChange={handleOnChange} />
+                                    </div>
+                        
+                                    <div className="col-md-6">
+                                        <label htmlFor="email" className="form-label"> Email </label>
+                                        <input type="email" className="form-control" name="email" id="email" placeholder="monadresse@email.com" onChange={handleOnChange} autoComplete="off" />
+                                        <div className="invalid-feedback">L'adresse e-mail est obligatoire.</div>
+                                        {/*{formError.email && <p>Ajouter une adresse email valide</p>} */}
+                                    </div>
+                        
+                                    <div className="col-md-8">
+                                        <label htmlFor="adresse" className="form-label"> Adresse : </label>
+                                        <input type="text" className="form-control" name="adresse" id="adresse" placeholder="01 bp 1010 Abidjan 05" onChange={handleOnChange} required />
+                                        <div className="invalid-feedback">Une adresse postale est requise.</div>
+                                    </div>
+
+                                    <div className="col-md-4">
+                                        <label htmlFor="codepostal" className="form-label"> Code postal : </label>
+                                        <input type="number" className="form-control" name="codepostal" id="codepostal" maxLength="5" placeholder="00225" onChange={handleOnChange} required />
+                                        <div className="invalid-feedback">Le code postale est requise.</div>
+                                    </div>
+                        
+                                    <div className="col-md-6">
+                                        <label htmlFor="paysresidence" className="form-label"> Pays de résidence : </label>
+                                        <input type="text" className="form-control" name="paysresidence" id="paysresidence" placeholder="Pays d'habitation" onChange={handleOnChange} />
+                                        <div className="invalid-feedback">Champ obligatoire.</div>
+                                    </div>
+                        
+                                    <div className="col-md-6">
+                                        <label htmlFor="villeresidence" className="form-label"> Ville de résidence : </label>
+                                        <input type="text" className="form-control" name="villeresidence" id="villeresidence" placeholder="Ville d'habitation" onChange={handleOnChange} />
+                                        <div className="invalid-feedback">Champ obligatoire.</div>
+                                    </div>
+                        
+                                    <div className="col-md-6">
+                                        <label htmlFor="quartier" className="form-label"> Quartier : </label>
+                                        <input type="text" className="form-control" name="quartier" id="quartier" placeholder="Quartier d'habitation" onChange={handleOnChange} required />
+                                        <div className="invalid-feedback">Champ obligatoire.</div>
+                                    </div>
+                        
+                                    <div className="col-md-6">
+                                        <label htmlFor="telephone" className="form-label"> Numéro de téléphone : </label>
+                                        <input type="tel" className="form-control" name="telephone" id="telephone" placeholder="Contact téléphonique principal" maxLength="10" onChange={handleOnChange} />
+                                        <div className="invalid-feedback">Champ obligatoire.</div>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label htmlFor="telephone1" className="form-label"> Numéro de téléphone : <span className="text-body-secondary">(Optionel)</span></label>
+                                        <input type="tel" className="form-control" name="telephone1" id="telephone1" placeholder="Contact téléphonique secondaire" maxLength="10" onChange={handleOnChange} />
+                                        <div className="invalid-feedback">Champ obligatoire.</div>
+                                    </div>
+                                </div>
                             </div>
                 
-                            <div className="col-md-5">
-                                <label htmlFor="paysresidence" className="form-label"> Pays de résidence : </label>
-                                <input type="text" className="form-control" name="paysresidence" id="paysresidence" placeholder="Pays d'habitation" onChange={handleOnChange} />
-                                <div className="invalid-feedback">Champ obligatoire.</div>
-                            </div>
-                
-                            <div className="col-md-4">
-                                <label htmlFor="villeresidence" className="form-label"> Ville de résidence : </label>
-                                <input type="text" className="form-control" name="villeresidence" id="villeresidence" placeholder="Ville d'habitation" onChange={handleOnChange} />
-                                <div className="invalid-feedback">Champ obligatoire.</div>
-                            </div>
-                
-                            <div className="col-md-3">
-                                <label htmlFor="quartier" className="form-label"> Quartier : </label>
-                                <input type="text" className="form-control" name="quartier" id="quartier" placeholder="Quartier d'habitation" onChange={handleOnChange} required />
-                                <div className="invalid-feedback">Champ obligatoire.</div>
-                            </div>
-                
-                            <div className="col-md-4">
-                                <label htmlFor="telephone" className="form-label"> Numéro de téléphone : </label>
-                                <input type="tel" className="form-control" name="telephone" id="telephone" placeholder="Contact téléphonique principal" maxLength="10" onChange={handleOnChange} />
-                                <div className="invalid-feedback">Champ obligatoire.</div>
-                            </div>
-                
-                            <div className="col-md-4">
-                                <label htmlFor="telephone1" className="form-label"> Numéro de téléphone : <span className="text-body-secondary">(Optionel)</span></label>
-                                <input type="tel" className="form-control" name="telephone1" id="telephone1" placeholder="Contact téléphonique secondaire" maxLength="10" onChange={handleOnChange} />
-                                <div className="invalid-feedback">Champ obligatoire.</div>
-                            </div>
-                
-                            <div className="col-md-4">
-                                <label htmlFor="photo" className="form-label"> Photo : </label>
-                                <input type="file" className="form-control" name="photo" id="photo" placeholder="Image" onChange={handleOnChange} />
-                                <small> Telecharger la photo </small>
-                            </div>
-                            <div className="col-md-12 mt-2 d-flex justify-content-center">
-                                {profilePhoto &&
-                                    <div className="pprofile"><img src={profilePhoto} alt='' className='preview' /></div>
-                                }
+                            <div className='col-md-4'>
+                                <div className="row">
+                                    <div className='col-md-12'>
+                                        {/* <PhotoResizer selectedPicture={selectedPicture} setCurrentPage={setCurrentPage} setPictureAfter={setPictureAfter} pictureAfter={pictureAfter} choosePicture={choosePicture} picture={picture} setPicture={setPicture} /> */}
+                                        
+                                        {currentPage === "choose-img" ? (
+                                            <div className='d-flex flex-wrap justify-content-center croppedimg' onClick={choosePicture}>
+                                                <img src='/src/assets/default-picture.jpg' alt='Defaut' className='mb-3' />
+                                                <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+                                                <button className='btn btn-warning' onClick={choosePicture}>Choissir la photo</button>
+                                            </div>
+                                        ):(
+                                            currentPage === "crop-img" ? (
+                                            <>
+                                                <div className='row'>
+                                                    <div className='cropper'>
+                                                        <div className='crop-container'>
+                                                            <Cropper
+                                                                image={picture}
+                                                                aspect={aspectRatio}
+                                                                crop={crop}
+                                                                zoom={zoom}
+                                                                onCropChange={setCrop}
+                                                                onZoomChange={setZoom}
+                                                                onCropComplete={onCropComplete}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="btn-container controls gap-3 mt-3">
+                                                        <button className='btn btn-danger' onClick={onCropCancel}> Annuler </button>
+                                                        <button className='btn btn-success' onClick={() => onCropDone(croppedArea)}> Appliquer </button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                            ):(
+                                            <>
+                                                <div className='croppedimg d-flex flex-wrap justify-content-center' onClick={choosePicture}>
+                                                    {pictureAfter !== '' && <img src={pictureAfter} className='cropped-img' />}
+                                                    <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+                                                    <button className='btn btn-warning mt-3' onClick={choosePicture}>Changer la photo</button>
+                                                </div>
+                                            </>
+                                            )
+                                        )}
+
+                                    </div>
+                        
+                                    {/* <div className="col-md-12">
+                                        <label htmlFor="photo" className="form-label"> Photo : </label>
+                                        <input type="file" className="form-control" name="photo" id="photo" placeholder="Image" onChange={handleOnChange} />
+                                        <small> Telecharger la photo </small>
+                                    </div>
+
+                                    <div className="col-md-12 mt-2 d-flex justify-content-center">
+                                        {profilePhoto &&
+                                            <div className="pprofile"><img src={profilePhoto} alt='' className='preview' /></div>
+                                        }
+                                    </div> */}
+                                    
+                                </div>
                             </div>
                         </div>
 
@@ -383,14 +497,14 @@ const AjoutAdherent = () => {
                                 </div>
                             </div>
 
-                            <hr className="my-4" />
+                            {/* <hr className="my-4" />
                             <div className="col-md-12">
                                 <label htmlFor="nombrelative" className="form-label"> Nombre de protégé(s) : <span className="text-body-primary">(Optionel)</span></label>
                                 <input type="text" className="form-control" name="nombrelative" id="nombrelative" placeholder="Nombre d'enfant et d'epoux(se)" onChange={handleOnChange} />
                                 <small className=""> Les enfants comprennent tous les enfants biologiques, les enfants légalement adoptés, et les beaux-enfants célibataires et âgés de moins de 21 ans à la date d'inscription. 
                                     Tous les enfants éligibles doivent etre inclus, même s'ils ne vivent pas avec vous ou s'ils n'ont pas l'intention de partir aux USA. Le fait de ne pas répertorier tous les enfants éligibles constitue un motif de disqualification. Tout enfant citoyen américain ou résident permanent légal, ne doit pas etre ajouté lors de l'inscription.
                                 </small>
-                            </div>
+                            </div> */}
                         </div>
 
                         <hr className="my-4" />                

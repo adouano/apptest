@@ -50,7 +50,7 @@ const Versements = ({adherent,restApayer}) => {
 
   return (
     <>
-      <Button variant="success" onClick={handleShow}>Paiement</Button>
+      <Button variant="success" onClick={handleShow}> <i className="bi bi-currency-exchange"></i> Paiement</Button>
 
       <Modal centered show={show} onHide={handleClose}>
         <Modal.Header closeButton>

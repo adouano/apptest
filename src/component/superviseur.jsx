@@ -66,20 +66,20 @@ const Superviseur = ({userprofile}) => {
         associatesData();
     }, []);
 
-    const deletePerson = async (personeId) => {
-        try{
-          const {error} = await supabase.from('dvenrollment').delete().eq('id', personeId).select();
+    // const deletePerson = async (personeId) => {
+    //     try{
+    //       const {error} = await supabase.from('dvenrollment').delete().eq('id', personeId).select();
           
-          if(error){
-            throw new Error("Something went wrong when deleting ...");
-          }
-          // Alert(`Are you sure to delete this item: ${item.item_name}`);
-          setFetchData(fetchData.filter((person) => person.id !== personeId));
-        }
-        catch(error){
-          console.log("Error: ", error);
-        }
-    }
+    //       if(error){
+    //         throw new Error("Something went wrong when deleting ...");
+    //       }
+    //       // Alert(`Are you sure to delete this item: ${item.item_name}`);
+    //       setFetchData(fetchData.filter((person) => person.id !== personeId));
+    //     }
+    //     catch(error){
+    //       console.log("Error: ", error);
+    //     }
+    // }
     
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -127,9 +127,9 @@ const Superviseur = ({userprofile}) => {
                 </div>
             </header>
 
-            <div className="container-xl p-5">
+            <div className="container-xl pb-5 pt-5">
                 <div className="row gx-5">
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-primary border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -142,7 +142,7 @@ const Superviseur = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-warning border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -155,7 +155,7 @@ const Superviseur = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-secondary border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -168,7 +168,7 @@ const Superviseur = ({userprofile}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xxl-3 col-md-6 mb-5">
+                    <div className="col-xxl-3 col-md-3 mb-5">
                         <div className="card card-raised border-start border-info border-4">
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -229,9 +229,9 @@ const Superviseur = ({userprofile}) => {
                         </div>
                     </div>
                     
-                    <AdherentList adherents={searchFilter} userprofile={userprofile} />
+                    <AdherentList adherents={searchFilter} userprofile={userprofile} key={userprofile.id}  />
                     {/* <AdherentList adherents={currentPeople} userprofile={userprofile} searchFilter={searchFilter} /> */}
-                    <Pagination totalPerson={fetchData.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+                    <Pagination totalPerson={fetchData.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} key={userprofile.id}  />
                 </div>
             </div>
         </>

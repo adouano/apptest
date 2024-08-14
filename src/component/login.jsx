@@ -5,7 +5,7 @@ import { useAuth } from '../config/userContext';
 import { Alert } from 'react-bootstrap';
 
 const LoginForm = () => {
-  const { login, userError } = useAuth();
+  const { login,userError } = useAuth();
   const [password, setPassword] = useState('');  
   const [email, setEmail] = useState(null);
   const [errors, setErrors] = useState(null);
@@ -34,8 +34,8 @@ const LoginForm = () => {
     try{
         const { data, error } = await supabase.from('associates').select().eq('email',email).single();
 
-        if(!data.email){
-          setErrors("Cette adresse email n'existe pas dans notre base de donnee.");
+        if(data.email !== email){
+          setErrors("Cette adresse email n'existe pas dans notre base de donnée.");
           return;
         }
         if(data.status !== true){
@@ -46,10 +46,11 @@ const LoginForm = () => {
           setErrors("Ce compte a été supprimé...; veuillez contacter votre superviseur pour plus d'info.");
           return;
         }
-        setProfile(data);
+        // setProfile(data);
       }
       catch(error){
         console.log(error.message);
+        console.log('Erreur: ', error);
       }
 
     try{
@@ -62,7 +63,7 @@ const LoginForm = () => {
   }
 
   useEffect(() => {
-    const interval = setTimeout(() => setErrors(""), 4000);
+    const interval = setTimeout(() => setErrors(""), 5000);
     return () => clearTimeout(interval);
   }, [errors]);
 

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import supabase from '../config/dbConfig';
 import {Button, Modal, Card, ListGroup} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../config/userContext';
 
 const ModalInfoAgent = ({associate}) => {
+    const { user } = useAuth();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [statuts, setStatuts] = useState(!associate?.status);
@@ -17,12 +19,27 @@ const ModalInfoAgent = ({associate}) => {
         .eq('id', associate?.id)
         .select();
 
-      if (error) {
+        if(!error){
+          if(statuts===true){
+            await supabase
+            .from('dvenrollogs')
+            .insert({
+                action:`Gestion de compte`,
+                note:`${user.email} a activé le compte de ${associate?.email}...`
+            })
+          }else{
+            await supabase
+            .from('dvenrollogs')
+            .insert({
+                action:`Gestion de compte`,
+                note:`${user.email} a désactivé le compte de ${associate?.email}...`
+            })
+          }
+          window.location.reload();
+          setShow(false);
+        }else{
         throw new Error(error.message);
       }
-      window.location.reload();
-      // navigate('/');
-      setShow(false);
     }
     catch(error){
       console.log("Erreur :", error);
@@ -40,11 +57,18 @@ const ModalInfoAgent = ({associate}) => {
         .eq('id', associate?.id)
         .select();
 
-      if (error) {
-        throw new Error(error.message);
+        if(!error){
+            await supabase
+            .from('dvenrollogs')
+            .insert({
+                action:`Suppression de compte`,
+                note:`${user.email} souhaite supprimer le compte de ${associate?.email}...`
+            });
+            navigate('/');
+            setShow(false);
+        }else{
+          throw new Error(error.message);
       }
-      navigate('/');
-      setShow(false);
     }
     catch(error){
         console.log("Erreur : ", error);

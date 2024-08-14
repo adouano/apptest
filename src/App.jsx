@@ -27,42 +27,43 @@ import ResetPassword from './component/resetpassword';
 
 import TestUpload from './component/testfileupload';
 import Associates from './component/associates';
+import AppEventsLogs from './component/appEvents';
 
 
 function App() {
   // const { user } = useAuth();
-  // console.log(user);
+  // console.log(AuthProvider);
   const navigate = useNavigate();
  
   return (
-    
-    <AuthProvider>
-      {/* <Header /> */}
-      <Routes>                
-        <Route path="connexion" element={<LoginForm />} />
-        <Route path="inscription" element={<AccountCreation />} />
-        <Route index element={<Dashboard />} />
-        <Route ProtectedRoute path="admin" element={<Administrator />} roles={['admin']} />
-        <Route ProtectedRoute path="superviseur" element={<Superviseur />} roles={['supervisor']} />
-        <Route ProtectedRoute path="finance" element={<Caissiere />} roles={['finance']} />
-        <Route ProtectedRoute path="agent" element={<Commercial />} roles={['agent']} />
-        <Route path="adherent/ajouter" element={<AjoutAdherent />} />
-        <Route path="adherent/:personId/info" element={<InfoAdherent />} />
-        <Route path="adherent/:personId/modifier" element={<EditAdherent />} />
-        <Route path="relative/ajouter" element={<AjoutRelative />} />
-        <Route path="relative/:personId/info" element={<InfoRelative />} />
-        <Route path="relative/:personId/modifier" element={<EditRelative />} />
-        <Route path=":userId/profile" element={<Profile />} />
-        <Route path=":userId/configuration" element={<Configuration />} />
-        <Route path="reg_success" element={<RegistrationSuccess />} />
-        <Route path="resetpassword" element={<ResetPassword />} />
-        <Route path="associates" element={<Associates />} />
-        <Route path="*" element={<ErrorPage />} />
+      <AuthProvider>
+        {/* <Header /> */}
+        <Routes>                
+          <Route path="connexion" element={<LoginForm />} />
+          <Route path="inscription" element={<AccountCreation />} />
+          <Route index element={<Dashboard />} />
+          <Route ProtectedRoute path="admin" element={<Administrator />} roles={['admin']} />
+          <Route ProtectedRoute path="superviseur" element={<Superviseur />} roles={['supervisor']} />
+          <Route ProtectedRoute path="finance" element={<Caissiere />} roles={['finance']} />
+          <Route ProtectedRoute path="agent" element={<Commercial />} roles={['agent']} />
+          <Route path="adherent/ajouter" element={<AjoutAdherent />} />
+          <Route path="adherent/:personId/info" element={<InfoAdherent />} />
+          <Route path="adherent/:personId/modifier" element={<EditAdherent />} />
+          <Route path="relative/ajouter" element={<AjoutRelative />} />
+          <Route path="relative/:personId/info" element={<InfoRelative />} />
+          <Route path="relative/:personId/modifier" element={<EditRelative />} />
+          <Route path=":userId/profile" element={<Profile />} />
+          <Route path=":userId/configuration" element={<Configuration />} />
+          <Route path=":userId/events" element={<AppEventsLogs />} />
+          <Route path="reg_success" element={<RegistrationSuccess />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
+          <Route path="associates" element={<Associates />} />
+          <Route path="*" element={<ErrorPage />} />
 
-        {/* <Route path="uploadimg" element={<TestUpload />} /> */}
-      </Routes>
-      {/* <Footer /> */}
-    </AuthProvider>
+          {/* <Route path="uploadimg" element={<TestUpload />} /> */}
+        </Routes>
+        {/* <Footer /> */}
+      </AuthProvider>
   );
 
   // return (
