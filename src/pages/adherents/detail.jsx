@@ -10,6 +10,7 @@ import Header from "../../header";
 import Footer from "../../footer";
 import EditAdherent from "./modifier";
 import PhotoCropper from "../../component/photoCropper";
+import EditRelative from "../relatives/modifier";
 
 const InfoAdherent = () => {
     const {personId} = useParams();
@@ -18,6 +19,7 @@ const InfoAdherent = () => {
     const [adherent, setAdherent] = useState([]);
     const [relatives, setRelatives] = useState([]);
     const [depots, setDepots] = useState([]);
+    const [afterAdd, setAfterAdd] = useState('');
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
 
@@ -28,7 +30,7 @@ const InfoAdherent = () => {
 
     const fetchPersons = async () => {
         try{
-            const { data,error } = await supabase.from('dvenrollment').select().eq('id', personId).single();
+            const { data,error } = await supabase.from('dvenrollment').select().eq('id', personId).limit(1).single();
 
         if(error){
             throw new Error(error.message);
@@ -79,7 +81,7 @@ const InfoAdherent = () => {
     });
     const restApayer = Number(netApayer) - Number(depoTotal);
 
-    const suppPay= async (payId) => {
+    const supprimerDepot = async (payId) => {
         try {
           const { error } = await supabase.from('dvtransaction').delete().eq('id', payId);
     
@@ -110,7 +112,7 @@ const InfoAdherent = () => {
         e.preventDefault();
 
         if(dvConfirm === ""){
-            setFetchError("Veuillez ajouter le numero de confirmation");
+            setFetchError("Veuillez ajouter le numéro de confirmation");
             return;
         }
         try{
@@ -134,13 +136,36 @@ const InfoAdherent = () => {
         return () => clearTimeout(interval);
     }, [fetchError]);
 
+    const delectRelative = async (relativeId,relativeName) => {
+        try {
+          const { error } = await supabase.from('dvrelatives').delete().eq('id', relativeId);
+    
+        if(!error){
+            await supabase
+                .from('dvenrollogs')
+                .insert({
+                    action:`Suppression d'enrollement`,
+                    note:`${user.email} a supprimé les informations de ${relativeName} qui est lié(e) à ${adherent.nomdefamille} ...`
+                });
+        }else{
+            throw new Error("Impossible de supprimer...");
+          }         
+          setRelatives(relatives.filter((relative) => relative.id !== relativeId));
+        } catch (error) {
+            console.log("Deleting error :", error);
+            //   console.log(error.message);
+        }
+    };
+
+    // logic pour le bonus de l'agent enrolleur ////// a revoir **************///////////////////////*******************************////////////// */
+
     if(loading){
       return(<LoadingPage />);
       }else{
 
         return (
         <>
-        <Header userprofile={profile} />
+        <Header />
             <div className="container-xl pb-5 pt-5">
                 <div className="row">
                     <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -248,7 +273,7 @@ const InfoAdherent = () => {
                                 <button data-original-title="Remove this user" data-toggle="tooltip" type="button" className="btn btn-sm btn-danger"><i className="bi bi-trash3-fill"></i></button>
                             </div>
                             <div className='d-flex gap-2 float-end'>
-                                {restApayer !== 0 && <Versements adherent={adherent} relatives={relatives} depots={depots} config={config} restApayer={restApayer} />}
+                                {restApayer !== 0 && <Versements adherent={adherent} relatives={relatives} setAfterAdd={setAfterAdd} config={config} restApayer={restApayer} />}
                                 <AjoutRelative adherent={adherent} />
                                 {adherent.numerodvlottery === null && 
                                 <>
@@ -278,23 +303,29 @@ const InfoAdherent = () => {
 
                 <hr />
                 {/*Visible par la Caissiere, admin et superviseur*/}
-                {relatives.length !== 0 ?
+                {depots.length !== 0 ?
                 (<>
                     <div className="">
                         <div className="row mb-3">
                             <div className="col">
                                 <h2 className=""> Liste de Versements</h2>
-                                <div className={depoTotal === 0 ? ('card-subtitle badge text-bg-info'):(netApayer > depoTotal ? 'card-subtitle badge text-bg-warning' : 'card-subtitle badge text-bg-success')}>{depoTotal ===0 ? ('Paiement en attente'):(netApayer > depoTotal ? 'Paiement en cours' : 'Soldé')}</div>
+                                <div className={depoTotal === 0 ? ('card-subtitle badge text-bg-info'):(netApayer > depoTotal ? 'card-subtitle badge text-bg-warning' : 'card-subtitle badge text-bg-success')}>{depoTotal === 0 ? ('Paiement en attente'):(netApayer > depoTotal ? 'Paiement en cours' : 'Soldé')}</div>
                                 <table className="table">
                                     <tbody>
-                                    {depots.map((depot) => (
-                                        <tr key={depot.id}>
-                                            <td> {new Date(depot.created_at).toLocaleDateString()} </td>
-                                            <td> {depot.designation} </td>
-                                            <td> {depot.depots} </td>
-                                            <td> <button className="btn btn-danger" onClick={() => suppPay(depot.id)}>X</button> </td>
-                                        </tr>
-                                    ))}
+                                        {/* {afterAdd && 
+                                            <tr>
+                                                <td>{new Date(afterAdd.created_at).toLocaleDateString()}</td>
+                                                <td>{afterAdd.designation}</td>
+                                                <td>{afterAdd.depots}</td>
+                                            </tr>} */}
+                                        {depots.map((depot) => (
+                                            <tr key={depot.id}>
+                                                <td> {new Date(depot.created_at).toLocaleDateString()} </td>
+                                                <td> {depot.designation} </td>
+                                                <td> {depot.depots} </td>
+                                                <td> <button className="btn btn-danger" onClick={() => supprimerDepot(depot.id)}>X</button> </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
@@ -337,7 +368,7 @@ const InfoAdherent = () => {
                     </div>
                 )}
 
-                {(adherent.nombredeprotege !== 0 && relatives.length) ? (
+                {relatives.length !== 0 ? (
                 <div className="row py-5 bg-body-tertiary">
                     <h1 className="panel-heading"> Liste de protégé - ({relatives.length}) </h1>
                     <small className=""> Les enfants comprennent tous les enfants biologiques, les enfants légalement adoptés, et les beaux-enfants célibataires et âgés de moins de 21 ans à la date d'inscription. 
@@ -380,8 +411,8 @@ const InfoAdherent = () => {
                                     <div className="d-flex justify-content-center align-items-center">
                                         <div className="btn-group">
                                             {/* <a type="button" className="btn btn-sm btn-outline-primary" href="details-relative.html"> Details </a> */}
-                                            <button type="button" className="btn btn-sm btn-outline-warning"><i className="bi bi-pencil-square"></i> Modifier </button>
-                                            <button type="button" className="btn btn-sm btn-outline-danger"><i className="bi bi-trash3"></i> Supprimer </button>
+                                            <EditRelative relative={relative} key={relative.id} />
+                                            <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => delectRelative(relative.id,relative.prenomsdefamille)} ><i className="bi bi-trash3"></i> Supprimer </button>
                                         </div>
                                         <small className="text-body-secondary"></small>
                                     </div>

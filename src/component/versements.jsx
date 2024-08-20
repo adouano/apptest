@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {Button, Form, Modal, Alert} from 'react-bootstrap';
 import supabase from '../config/dbConfig';
 
-const Versements = ({adherent,restApayer}) => {
+const Versements = ({adherent,restApayer,setAfterAdd}) => {
     const [show, setShow] = useState(false);
     const [libelle, setLibelle] = useState('');
     const [montant, setMontant] = useState('');
@@ -17,28 +17,56 @@ const Versements = ({adherent,restApayer}) => {
         setErreur('Le montant ne doit pas être supérieur à la somme due...');
         return;
       }
-      try{
-        const { data,error } = await supabase
-        .from('dvtransaction')
-        .insert({
-          associate_id:adherent.associate_id,
-          adherent_id:adherent.id,
-          designation:libelle,
-          depots:montant,
-          status:'false'
-        })
-        .eq('adherent_id', adherent.id)
-        .select();
-
-        if(error){
-          throw new Error(error.message);
+      if(Number(montant) === Number(restApayer)){
+        try{
+          const { data,error } = await supabase
+          .from('dvtransaction')
+          .insert({
+            associate_id:adherent.associate_id,
+            adherent_id:adherent.id,
+            designation:libelle,
+            depots:montant,
+            status:true
+          })
+          .eq('adherent_id', adherent.id)
+          .select();
+          setAfterAdd(data);
+  
+          if(error){
+            throw new Error(error.message);
+          }
+  
+          setTransact(data);
+          setShow(false);
         }
+        catch(error){
+          console.log(error.message);
+        }
+      }else{
+        try{
+          const { data,error } = await supabase
+          .from('dvtransaction')
+          .insert({
+            associate_id:adherent.associate_id,
+            adherent_id:adherent.id,
+            designation:libelle,
+            depots:montant,
+            status:false
+          })
+          .eq('adherent_id', adherent.id)
+          .select();
+          setAfterAdd(data);
 
-        setTransact(data);
-        setShow(false);
-      }
-      catch(error){
-        console.log(error.message);
+          if(error){
+            throw new Error(error.message);
+          }
+
+          setTransact(data);
+          setShow(false);
+        }
+        catch(error){
+          console.log(error.message);
+        }
       }
     };
 

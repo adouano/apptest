@@ -23,6 +23,7 @@ const AjoutAdherent = () => {
         pays:"",
         email:"",
         adresse:"",
+        codepostal:"",
         paysresidence:"",
         villeresidence:"",
         quartier:"",
@@ -46,7 +47,7 @@ const AjoutAdherent = () => {
     const [currentPage, setCurrentPage] = useState('choose-img');
     let userId = user?.id;
 
-    const [numDossier, setNumDossier] = useState(0);
+    const [numDossier, setNumDossier] = useState('0');
     useEffect(() => {
         const NumDossierAleatoire = () => {
             return Math.floor(Math.random() * (99990 - 1 + 1)) + 1;
@@ -66,12 +67,12 @@ const AjoutAdherent = () => {
             setUserData(data);
         }
         catch(error){
-            console.log("Error :" + error);
+            console.log("Erreur: " + error.message);
         }
     }
     useEffect(() => {
-        fetchUser(userId);
-    }, [userId]);
+        fetchUser(user?.id);
+    }, [user?.id]);
 
     const handleOnChange = (e) => {
         const {name,value} = e.target;
@@ -138,14 +139,10 @@ const AjoutAdherent = () => {
     }
 
     const handleSubmit = async (e) => {
-        console.log(pictureAfter);
-        console.log(formData);
-
         e.preventDefault();
-        let nbreProtege = 0;
-       // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/i;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+        // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_+-=[]{};':"|\\,.<>/?]).{8,}$/i;
 
         if(!formData.nomfamille || !formData.prenomfamille || !formData.datenaissance || !formData.lieunaissance || !formData.genre || !formData.pays || !formData.email || !formData.adresse || !formData.paysresidence || !formData.villeresidence || !formData.quartier || !formData.telephone || !formData.niveauscolaire || !formData.statutmarital){
@@ -158,12 +155,13 @@ const AjoutAdherent = () => {
         }
         // if(phoneRegex.test(formData.telephone)){
         if(!(formData.telephone.match('[0-9]{10}')) ){
-            setFormError("Le numero de telephone doit contenir 10 caracteres.");
+            setFormError("Le numéro de téléphone doit contenir 10 caractères.");
             return;
-       }
-       if(formData.nombrelative !== ''){
-            nbreProtege = formData.nombrelative;
-       }
+        }
+        if(!(formData.codepostal.match('[0-9]{5}')) ){
+            setFormError("Le code postal doit contenir 5 caractères.");
+            return;
+        }
 
        try{
         const { data, error } = await supabase
@@ -201,9 +199,10 @@ const AjoutAdherent = () => {
             await supabase
                 .from('dvenrollogs')
                 .insert({
-                action:`Ajout d'adherent`,
-                note:`${user.email} a ajouté ${data[0].id}...`
-            });
+                    role:userData.role,
+                    action:`Ajout d'adherent`,
+                    note:`${user.email} a ajouté ${data[0].prenomdefamille}...`
+                });
 
             setFormError(null);
             navigate(`/adherent/${data[0].id}/info`);
@@ -215,7 +214,7 @@ const AjoutAdherent = () => {
 
   return (
     <>
-    <Header userprofile={userData} />
+    <Header />
         <div className="container-xl pb-5 pt-5">
             <div className="container-fluid">
             <h1 className="page-title"> Nouveau Adhérent  </h1>
@@ -226,12 +225,12 @@ const AjoutAdherent = () => {
 
                         <div className='row mb-3'>
                             <div className="col-md-4">
-                                <label htmlFor="numdossier" className="form-label"> Numero de Dossier : </label>
-                                <input type="text" className="form-control" name="numdossier" id="numdossier" defaultValue={enrolDossier} onChange={handleOnChange} disabled />
+                                <label htmlFor="numdossier" className="form-label"> Numéro de Dossier : </label>
+                                <input type="text" className="form-control" name="numdossier" id="numdossier" value={enrolDossier} onChange={handleOnChange} disabled />
                             </div>
                             <div className="col-md-4">
-                                <label htmlFor="numdvlottery" className="form-label"> Numero DV Lottery : </label>
-                                <input type="text" className="form-control" name="numdvlottery" id="numdvlottery" placeholder="Numero de confirmation DV Lottery" disabled />
+                                <label htmlFor="numdvlottery" className="form-label"> Numéro DV Lottery : </label>
+                                <input type="text" className="form-control" name="numdvlottery" id="numdvlottery" placeholder="Numéro de confirmation DV Lottery" disabled />
                             </div>
                             <div className="col-md-4">
                                 <label htmlFor="enrollocation" className="form-label"> Bureau d'enrollement: </label>
@@ -240,52 +239,94 @@ const AjoutAdherent = () => {
                         </div>
 
                         <div className="row g-3 mb-3">
-                            <div className="col-md-5">
-                                <label htmlFor="nomfamille" className="form-label"> Nom : </label>
-                                <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder="Komenan" onChange={handleOnChange} required />
-                                <div className="invalid-feedback">Le nom de famille est requis.</div>
-                            </div>
-                
-                            <div className="col-md-7">
-                                <label htmlFor="prenomfamille" className="form-label"> Prénoms : </label>
-                                <input type="text" className="form-control" name="prenomfamille" id="prenomfamille" placeholder="Gramboute Achi Franck" onChange={handleOnChange} required />
-                                <div className="invalid-feedback">Le prénom valide est requis.</div>
-                            </div>
-                
-                            <div className="col-md-3">
-                                <label htmlFor="datenaissance" className="form-label"> Date de naissance : </label>
-                                <div className="input-group has-validation">
-                                    {/*<span className="input-group-text">@</span>*/}
-                                    <input type="date" className="form-control" name="datenaissance" id="datenaissance" onChange={handleOnChange} required />
-                                    <div className="invalid-feedback">La date de naissance est obligatoire.</div>
+                            <div className='col-md-4'>
+                                <div className="row">
+                                    <div className='col-md-12'>
+                                        {currentPage === "choose-img" ? (
+                                            <div className='d-flex flex-wrap justify-content-center croppedimg' onClick={choosePicture}>
+                                                <img src='/src/assets/default-picture.jpg' alt='Defaut' className='mb-3' />
+                                                <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+                                                <button className='btn btn-warning' onClick={choosePicture}>Choissir la photo</button>
+                                            </div>
+                                        ):(
+                                            currentPage === "crop-img" ? (
+                                            <>
+                                                    <div className='cropper'>
+                                                        <div className='crop-container'>
+                                                            <Cropper
+                                                                image={picture}
+                                                                aspect={aspectRatio}
+                                                                crop={crop}
+                                                                zoom={zoom}
+                                                                onCropChange={setCrop}
+                                                                onZoomChange={setZoom}
+                                                                onCropComplete={onCropComplete}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="btn-container controls gap-3 mt-3">
+                                                        <button className='btn btn-danger' onClick={onCropCancel}> Annuler </button>
+                                                        <button className='btn btn-success' onClick={() => onCropDone(croppedArea)}> Appliquer </button>
+                                                    </div>
+                                            </>
+                                            ):(
+                                            <>
+                                                <div className='croppedimg d-flex flex-wrap justify-content-center' onClick={choosePicture}>
+                                                    {pictureAfter !== '' && <img src={pictureAfter} className='cropped-img' />}
+                                                    <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
+                                                    <button className='btn btn-warning mt-3' onClick={choosePicture}> Changer la photo </button>
+                                                </div>
+                                            </>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                
-                            <div className="col-md-6">
-                                <label htmlFor="lieunaissance" className="form-label"> Lieu de naissance : </label>
-                                <div className="input-group has-validation">
-                                    <input type="text" className="form-control" name="lieunaissance" id="lieunaissance" placeholder="Ville/Village/Commune de naissance" onChange={handleOnChange} required />
-                                    <div className="invalid-feedback">Le lieu de naissance est obligatoire.</div>
-                                </div>
-                            </div>
-                
-                            <div className="col-md-3">
-                                <label className="form-label"> Genre (Sexe) : <br/>
-                                    <div className="form-check form-check-inline">
-                                        <input className="form-check-input" type="radio" name="genre" id="homme" value="Homme" onChange={handleOnChange} required />
-                                        <label className="form-check-label" htmlFor="homme"> Homme </label>
-                                    </div>
-                                    <div className="form-check form-check-inline">
-                                        <input className="form-check-input" type="radio" name="genre" id="femme" value="Femme" onChange={handleOnChange} required />
-                                        <label className="form-check-label" htmlFor="femme"> Femme </label>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
 
-                        <div className="row g-3">
                             <div className='col-md-8'>
-                                <div className="row g-3">
+                            <h4 className=""> Etudes et Diplômes </h4>
+                                <div className='row g-3'>
+                                    <div className="col-md-5">
+                                        <label htmlFor="nomfamille" className="form-label"> Nom : </label>
+                                        <input type="text" className="form-control" name="nomfamille" id="nomfamille" placeholder="Komenan" onChange={handleOnChange} required />
+                                        <div className="invalid-feedback">Le nom de famille est requis.</div>
+                                    </div>
+                        
+                                    <div className="col-md-7">
+                                        <label htmlFor="prenomfamille" className="form-label"> Prénoms : </label>
+                                        <input type="text" className="form-control" name="prenomfamille" id="prenomfamille" placeholder="Gramboute Achi Franck" onChange={handleOnChange} required />
+                                        <div className="invalid-feedback">Le prénom valide est requis.</div>
+                                    </div>
+                        
+                                    <div className="col-md-3">
+                                        <label htmlFor="datenaissance" className="form-label"> Date de naissance : </label>
+                                        <div className="input-group has-validation">
+                                            {/*<span className="input-group-text">@</span>*/}
+                                            <input type="date" className="form-control" name="datenaissance" id="datenaissance" onChange={handleOnChange} required />
+                                            <div className="invalid-feedback">La date de naissance est obligatoire.</div>
+                                        </div>
+                                    </div>
+                        
+                                    <div className="col-md-6">
+                                        <label htmlFor="lieunaissance" className="form-label"> Lieu de naissance : </label>
+                                        <div className="input-group has-validation">
+                                            <input type="text" className="form-control" name="lieunaissance" id="lieunaissance" placeholder="Ville/Village/Commune de naissance" onChange={handleOnChange} required />
+                                            <div className="invalid-feedback">Le lieu de naissance est obligatoire.</div>
+                                        </div>
+                                    </div>
+                        
+                                    <div className="col-md-3">
+                                        <label className="form-label"> Genre (Sexe) : <br/>
+                                            <div className="form-check form-check-inline">
+                                                <input className="form-check-input" type="radio" name="genre" id="homme" value="Homme" onChange={handleOnChange} required />
+                                                <label className="form-check-label" htmlFor="homme"> Homme </label>
+                                            </div>
+                                            <div className="form-check form-check-inline">
+                                                <input className="form-check-input" type="radio" name="genre" id="femme" value="Femme" onChange={handleOnChange} required />
+                                                <label className="form-check-label" htmlFor="femme"> Femme </label>
+                                            </div>
+                                        </label>
+                                    </div>
                                     <div className="col-md-6">
                                         <label htmlFor="pays" className="form-label"> Pays de naissance : </label>
                                         <input type="text" className="form-control" name="pays" id="pays" placeholder="Pays de naissance" onChange={handleOnChange} />
@@ -310,19 +351,19 @@ const AjoutAdherent = () => {
                                         <div className="invalid-feedback">Le code postale est requise.</div>
                                     </div>
                         
-                                    <div className="col-md-6">
+                                    <div className="col-md-4">
                                         <label htmlFor="paysresidence" className="form-label"> Pays de résidence : </label>
                                         <input type="text" className="form-control" name="paysresidence" id="paysresidence" placeholder="Pays d'habitation" onChange={handleOnChange} />
                                         <div className="invalid-feedback">Champ obligatoire.</div>
                                     </div>
                         
-                                    <div className="col-md-6">
+                                    <div className="col-md-4">
                                         <label htmlFor="villeresidence" className="form-label"> Ville de résidence : </label>
                                         <input type="text" className="form-control" name="villeresidence" id="villeresidence" placeholder="Ville d'habitation" onChange={handleOnChange} />
                                         <div className="invalid-feedback">Champ obligatoire.</div>
                                     </div>
                         
-                                    <div className="col-md-6">
+                                    <div className="col-md-4">
                                         <label htmlFor="quartier" className="form-label"> Quartier : </label>
                                         <input type="text" className="form-control" name="quartier" id="quartier" placeholder="Quartier d'habitation" onChange={handleOnChange} required />
                                         <div className="invalid-feedback">Champ obligatoire.</div>
@@ -339,68 +380,6 @@ const AjoutAdherent = () => {
                                         <input type="tel" className="form-control" name="telephone1" id="telephone1" placeholder="Contact téléphonique secondaire" maxLength="10" onChange={handleOnChange} />
                                         <div className="invalid-feedback">Champ obligatoire.</div>
                                     </div>
-                                </div>
-                            </div>
-                
-                            <div className='col-md-4'>
-                                <div className="row">
-                                    <div className='col-md-12'>
-                                        {/* <PhotoResizer selectedPicture={selectedPicture} setCurrentPage={setCurrentPage} setPictureAfter={setPictureAfter} pictureAfter={pictureAfter} choosePicture={choosePicture} picture={picture} setPicture={setPicture} /> */}
-                                        
-                                        {currentPage === "choose-img" ? (
-                                            <div className='d-flex flex-wrap justify-content-center croppedimg' onClick={choosePicture}>
-                                                <img src='/src/assets/default-picture.jpg' alt='Defaut' className='mb-3' />
-                                                <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
-                                                <button className='btn btn-warning' onClick={choosePicture}>Choissir la photo</button>
-                                            </div>
-                                        ):(
-                                            currentPage === "crop-img" ? (
-                                            <>
-                                                <div className='row'>
-                                                    <div className='cropper'>
-                                                        <div className='crop-container'>
-                                                            <Cropper
-                                                                image={picture}
-                                                                aspect={aspectRatio}
-                                                                crop={crop}
-                                                                zoom={zoom}
-                                                                onCropChange={setCrop}
-                                                                onZoomChange={setZoom}
-                                                                onCropComplete={onCropComplete}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="btn-container controls gap-3 mt-3">
-                                                        <button className='btn btn-danger' onClick={onCropCancel}> Annuler </button>
-                                                        <button className='btn btn-success' onClick={() => onCropDone(croppedArea)}> Appliquer </button>
-                                                    </div>
-                                                </div>
-                                            </>
-                                            ):(
-                                            <>
-                                                <div className='croppedimg d-flex flex-wrap justify-content-center' onClick={choosePicture}>
-                                                    {pictureAfter !== '' && <img src={pictureAfter} className='cropped-img' />}
-                                                    <input type='file' accept='image/*' ref={inputRef} onChange={uploadpicture} style={{display:"none"}} />
-                                                    <button className='btn btn-warning mt-3' onClick={choosePicture}>Changer la photo</button>
-                                                </div>
-                                            </>
-                                            )
-                                        )}
-
-                                    </div>
-                        
-                                    {/* <div className="col-md-12">
-                                        <label htmlFor="photo" className="form-label"> Photo : </label>
-                                        <input type="file" className="form-control" name="photo" id="photo" placeholder="Image" onChange={handleOnChange} />
-                                        <small> Telecharger la photo </small>
-                                    </div>
-
-                                    <div className="col-md-12 mt-2 d-flex justify-content-center">
-                                        {profilePhoto &&
-                                            <div className="pprofile"><img src={profilePhoto} alt='' className='preview' /></div>
-                                        }
-                                    </div> */}
-                                    
                                 </div>
                             </div>
                         </div>

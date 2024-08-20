@@ -7,7 +7,7 @@ import { useAuth } from '../../config/userContext';
 import Header from '../../header';
 import LoadingPage from '../../component/loading';
 
-const EditAdherent = ({}) => {
+const EditAdherent = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);

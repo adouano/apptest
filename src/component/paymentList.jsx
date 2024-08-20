@@ -3,9 +3,10 @@ import Versements from './versements';
 import { Link } from 'react-router-dom';
 import supabase from '../config/dbConfig';
 
-const PaymentList = ({adherent}) => {
+const PaymentList = ({adherent, setSolde}) => {
     const [config, setConfig] = useState('');
     const [depots, setDepots] = useState([]);
+    const [afterAdd, setAfterAdd] = useState('');
     const [fetchError, setFetchError] = useState(null);
 
     const parametres = async () => {
@@ -13,23 +14,24 @@ const PaymentList = ({adherent}) => {
         setConfig(data);
     }
 
-    const versements = async () => {
-        try{
-            const { data,error } = await supabase.from('dvtransaction').select();
+    // const versements = async () => {
+    //     try{
+    //         const { data,error } = await supabase.from('dvtransaction').select();
 
-            if(error){
-                throw new Error(error.message);
-            }
-            setDepots(data);
-        }
-        catch(error){
-            setFetchError(error.message);
-        }
-    };
+    //         if(error){
+    //             throw new Error(error.message);
+    //         }
+    //         setDepots(data);
+    //     }
+    //     catch(error){
+    //         setFetchError(error.message);
+    //     }
+    // };
 
     let depoTotal = 0;
     const netApayer = Number(config.montant_adherent) + Number(adherent.dvrelatives.length * config.montant_relative);
-    depots.map((calculDepot) => {
+    setSolde(netApayer);
+    adherent.dvtransaction.map((calculDepot) => {
         calculDepot.adherent_id === adherent.id ?
         (depoTotal += Number(calculDepot.depots)):('0')
         return depoTotal;
@@ -37,7 +39,7 @@ const PaymentList = ({adherent}) => {
     const restApayer = Number(netApayer) - Number(depoTotal);
 
     useEffect(() => {
-        versements();
+        // versements();
         parametres();
     }, []);
 
@@ -51,11 +53,12 @@ const PaymentList = ({adherent}) => {
             <td> {netApayer} </td>
             <td> {depoTotal} </td>
             <td> {restApayer} </td>
+            <td className={netApayer === depoTotal ? ('text-bg-success'):(netApayer === restApayer ? ('text-bg-secondary'):('text-bg-warning'))} > {netApayer === depoTotal ? ('Soldé'):(netApayer === restApayer ? ('En attente'):('En cours'))} </td>
             <td className="d-flex gap-2">
                 <Link to={`/adherent/${adherent.id}/info`}>
                     <button className="btn btn-info bg-gradient">Infos</button>
                 </Link>
-                <Versements adherent={adherent} config={config} restApayer={restApayer} />
+                <Versements adherent={adherent} config={config} restApayer={restApayer} setAfterAdd={setAfterAdd} />
             </td>
         </tr>
     </>

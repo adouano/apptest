@@ -233,7 +233,7 @@ const Configuration = ({userprofile}) => {
         fetchLocation();
     }, []);
 
-    const supprimBureau= async (localId,elocal) => {
+    const supprimBureau = async (localId,elocal) => {
         try {
           const { error } = await supabase.from('dvlieumission').delete().eq('id', localId);
     
@@ -261,25 +261,25 @@ const Configuration = ({userprofile}) => {
                 <h1 className='mb-5'>Configuration</h1>
                     {user?.id===userId ? (
                     <>
-                        <h3 className=''>Montant Adherent <span className="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adherent principal."> &#9432;</span></h3>
+                        <h3 className=''>Montant Adhérent <span className="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adhérent principal."> &#9432;</span></h3>
                         <Stack direction="horizontal" gap={3} className='pb-5'>
-                            <Form.Control className="me-auto" name='mtadherent' defaultValue={parametre.montant_adherent} onChange={(e) => setAdherent(e.target.value)} placeholder="Somme a payer pour l'adherent principal..." />
+                            <Form.Control className="me-auto" name='mtadherent' defaultValue={parametre.montant_adherent} onChange={(e) => setAdherent(e.target.value)} placeholder="Somme a payer pour l'adhérent principal..." />
                             <Button variant="secondary" onClick={handleAdherent}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>
                         </Stack>
                         
                             <div className="tooltip">&#9432;
-                                <span className="tooltiptext">Somme d'argent que devra payer l'adherent principal.</span>
+                                <span className="tooltiptext">Somme d'argent que devra payer l'adhérent principal.</span>
                             </div>
 
                         <hr/>
-                        <h3 className='mt-5'>Montant Relative <i className="bi-info-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adherent principal." title="Somme d'argent qui devra etre paye pour chaque protege."></i> </h3>
+                        <h3 className='mt-5'>Montant Relative <i className="bi-info-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Somme d'argent que devra payer l'adherent principal." title="Somme d'argent qui devra etre paye pour chaque protégé."></i> </h3>
                         <Stack direction="horizontal" gap={3} className='pb-5'>
-                            <Form.Control className="me-auto" name='mtrelative' defaultValue={parametre.montant_relative} onChange={(e) => setRelative(e.target.value)} placeholder="Somme a payer par protege ajoute..." />
+                            <Form.Control className="me-auto" name='mtrelative' defaultValue={parametre.montant_relative} onChange={(e) => setRelative(e.target.value)} placeholder="Somme a payer par protégé ajouté..." />
                             <Button variant="secondary" onClick={handleRelative}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>                        
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>                        
                         </Stack>
 
                         <hr/>
@@ -288,7 +288,7 @@ const Configuration = ({userprofile}) => {
                             <Form.Control className="me-auto" name='bcommercial' defaultValue={parametre.bonus_commercial} onChange={(e) => setBonusCcl(e.target.value)} placeholder="Commision/Pourcentage..." />
                             <Button variant="secondary" onClick={handleBonusCommercial}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>
                         </Stack>
 
                         <hr/>
@@ -297,7 +297,7 @@ const Configuration = ({userprofile}) => {
                             <Form.Control className="me-auto" name='bfinance' defaultValue={parametre.bonus_finance} onChange={(e) => setBonusFinance(e.target.value)} placeholder="Commision/Pourcentage..." />
                             <Button variant="secondary" onClick={handleBonusFinance}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>
                         </Stack>
 
                         <hr/>
@@ -306,7 +306,7 @@ const Configuration = ({userprofile}) => {
                             <Form.Control className="me-auto" name='binfo' defaultValue={parametre.bonus_informaticien} onChange={(e) => setBonusInfo(e.target.value)} placeholder="Commision/Pourcentage..." />
                             <Button variant="secondary" onClick={handleBonusInformaticien}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>
                         </Stack>
 
                         <hr/>
@@ -315,7 +315,7 @@ const Configuration = ({userprofile}) => {
                             <Form.Control className="me-auto" name='bsuper' defaultValue={parametre.bonus_supervisor} onChange={(e) => setBonusSupervisor(e.target.value)} placeholder="Commision/Pourcentage..." />
                             <Button variant="secondary" onClick={handleBonusSupervisor}>Enregistrer</Button>
                             <div className="vr" />
-                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                            <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>
                         </Stack>
 
                         <hr/>
@@ -333,7 +333,7 @@ const Configuration = ({userprofile}) => {
                             <Stack direction="horizontal" gap={3} className='pb-5'>
                                 <Button variant="secondary" onClick={handleBureau}>Enregistrer</Button>
                                 <div className="vr" />
-                                <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Reinitialiser</Button>
+                                <Button variant="outline-danger" type="reset" defaultValue="Reset" onClick={handleReset}>Réinitialiser</Button>
                             </Stack>
                         </Form>
                         

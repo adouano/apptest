@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState('');
   const [userError, setUserError] = useState('');
   const [getUId, setGetUId] = useState('');
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState('');
   const [session, setSession] = useState(null);  
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const navigate = useNavigate();
@@ -50,6 +50,16 @@ export const AuthProvider = ({ children }) => {
     // catch(error){
     //   console.log('Error: ', error);
     // }
+  }
+
+  const userprofile = async() => {
+    try{
+      const { data,error } = await supabase.from('associates').select().eq('associate_id', user?.id).limit(1).single();
+      setProfile(data);
+    }
+    catch(error){
+      console.log('Error: ', error);
+    }
   }
 
   const logout = async () => {
@@ -94,6 +104,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     getUserData();
+    userprofile();
   }, []);
 
   const handleGoBack = () => {

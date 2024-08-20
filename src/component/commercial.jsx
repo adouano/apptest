@@ -7,6 +7,7 @@ import LoadingPage from "./loading";
 import AdherentList from "./adherentList";
 import Pagination from "./pagination";
 import AjoutAdherent from "../pages/adherents/ajouter";
+import StatistiquesGraph from "./statGraph";
 
 const Commercial = ({userprofile}) => {
     const navigate = useNavigate();
@@ -19,14 +20,13 @@ const Commercial = ({userprofile}) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [personPerPage, setPersonPerPage] = useState(10);
 
-    let userId = user.id;
     const lastPostIndex = currentPage * personPerPage;
     const firstPostIndex = lastPostIndex - personPerPage;
     const currentPeople = fetchData.slice(firstPostIndex, lastPostIndex);
 
     const fetchPersons = async () => {
         try{
-            const {data,error} = await supabase.from('dvenrollment').select().eq('centrenroll', userprofile?.lieudemission, 'associate_id', userId).order('created_at', { ascending: true });
+            const {data,error} = await supabase.from('dvenrollment').select(`*, dvrelatives(*), dvtransaction(*)`).eq('associate_id', user?.id).order('created_at', { ascending: true });
             // const {data,error} = await supabase.from('dvenrollment').select()
             // .order('created_at', { ascending: true })
             // .eq('agent_id', userId);
@@ -48,9 +48,10 @@ const Commercial = ({userprofile}) => {
 
     useEffect(() => {
         fetchPersons();
+        // getFunction();
     }, []);
 
-    // console.log();
+    // console.log(functData);
 
 
     // const deleteItem = async (itemId) => {
@@ -114,6 +115,7 @@ const Commercial = ({userprofile}) => {
 
             
             <div className="container-xl pb-5 pt-5">
+                <StatistiquesGraph adherents={fetchData} />
                 {fetchData.length > 0 ? (
                 <>
                 <div className="row gx-5">
@@ -194,7 +196,7 @@ const Commercial = ({userprofile}) => {
                         </div>
                     </div>
                     
-                    <AdherentList adherents={searchFilter} userprofile={userprofile} key={userprofile.id} />
+                    <AdherentList adherents={searchFilter} userprofile={userprofile} setFetchData={setFetchData} key={userprofile.id} />
                     <Pagination totalPerson={fetchData.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
                 </div>

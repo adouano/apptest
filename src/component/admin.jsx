@@ -1,15 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {Link, useParams, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import supabase from '../config/dbConfig';
 import { useAuth } from '../config/userContext';
 import LoadingPage from "./loading";
 import AdherentList from "./adherentList";
 import Pagination from "./pagination";
 import ModalInfoAgent from './modal_agent';
-import StatistiquesGraph from './statGraph';
 
 const Administrator = ({userprofile}) => {
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [fetchData, setFetchData] = useState([]);
     const [fetchAssoc, setFetchAssoc] = useState([]);
@@ -414,7 +412,7 @@ const Administrator = ({userprofile}) => {
                         </div>
                     </div>
                     
-                    <AdherentList adherents={searchFilter} userprofile={userprofile} key={userprofile.id} />
+                    <AdherentList adherents={searchFilter} userprofile={userprofile} setFetchData={setFetchData} key={userprofile.id} />
                     <Pagination totalPerson={fetchData.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} />
                 </div>
             </div>

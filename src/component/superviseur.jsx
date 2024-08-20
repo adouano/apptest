@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../config/dbConfig";
-import {Link, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import { useAuth } from '../config/userContext';
 import LoadingPage from "./loading";
 import AdherentList from "./adherentList";
@@ -8,7 +8,6 @@ import Pagination from "./pagination";
 import AssociatesList from "./associatList";
 
 const Superviseur = ({userprofile}) => {
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [fetchData, setFetchData] = useState([]);
     const [fetchAssoc, setFetchAssoc] = useState([]);
@@ -26,7 +25,7 @@ const Superviseur = ({userprofile}) => {
 
     const fetchPersons = async () => {
         try{
-            const {data,error} = await supabase.from('dvenrollment').select().eq('centrenroll', userprofile?.lieudemission).order('created_at', { ascending: true });
+            const {data,error} = await supabase.from('dvenrollment').select('*, dvtransaction(*)').eq('centrenroll', userprofile?.lieudemission).order('created_at', { ascending: false });
     
             if(error){
                 throw new Error("Could not fetch data.");
@@ -61,10 +60,35 @@ const Superviseur = ({userprofile}) => {
         }
     };
 
+    // console.log(fetchData);
+
     useEffect(() => {
         fetchPersons();
         associatesData();
     }, []);
+
+    // Nbre d'enregistrement du jour
+    const dateDuJour = new Date().toLocaleDateString();
+    let statJour = 0;
+    let enrollJour = fetchData;
+    enrollJour.map((person) => {
+        const dbDate = new Date(person.created_at).toLocaleDateString();
+        if(dbDate === dateDuJour){
+            statJour++;
+        }
+    });
+
+    // Stats Financier
+    let versement = 0;
+    let enCaisse = 0;
+    let bilanFinancier = fetchData;
+    bilanFinancier.map((person,i) => {
+        versement += person.dvtransaction.length;
+
+        (person.dvtransaction).map((bilan) => {
+            enCaisse += bilan.depots;
+        })
+    })
 
     // const deletePerson = async (personeId) => {
     //     try{
@@ -134,8 +158,8 @@ const Superviseur = ({userprofile}) => {
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
                                     <div className="me-2">
-                                        <div className="display-5">3</div>
-                                        <div className="card-text">Enregistrement du jour</div>
+                                        <div className="display-5">{statJour}</div>
+                                        <div className="card-text">Enregistrement Aujourd'hui</div>
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-person-add" style={{fontSize: "4rem", color:"black"}}></i></div>
                                 </div>
@@ -147,8 +171,8 @@ const Superviseur = ({userprofile}) => {
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
                                     <div className="me-2">
-                                        <div className="display-5">12</div>
-                                        <div className="card-text">Payement effectué</div>
+                                        <div className="display-5">{versement}</div>
+                                        <div className="card-text">Versements effectué</div>
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-cash-coin" style={{fontSize: "4rem", color:"black"}}></i></div>
                                 </div>
@@ -160,7 +184,7 @@ const Superviseur = ({userprofile}) => {
                             <div className="card-body px-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
                                     <div className="me-2">
-                                        <div className="display-5">500</div>
+                                        <div className="display-5">{enCaisse}</div>
                                         <div className="card-text">Bonus sur paiement</div>
                                     </div>
                                     <div className="icon-circle text-black"><i className="bi-wallet2" style={{fontSize: "4rem", color:"black"}}></i></div>
@@ -183,28 +207,28 @@ const Superviseur = ({userprofile}) => {
                     </div>
                 </div>
 
-                    <div className="card card-raised mb-5">
-                        <div className="card-header bg-transparent px-2">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div className="me-4">
-                                    <h2 className="card-title mb-0">List de partenaires</h2>
-                                    <div className="card-subtitle"><i className="bi-building-fill" style={{paddingLeft: "-10px"}}></i> Lieu d'activité : {userprofile.lieudemission}</div>
-                                </div>
-                                <div className="d-flex gap-5">
-                                    <div className="card-tools">
-                                        <div className="input-group input-group-sm">
-                                            <input type="text" name="associate_search" className="form-control float-right" placeholder="Recherche" />
-                                            <div className="input-group-append">
-                                                <button type="submit" className="btn btn-secondary">Rechercher</button>
-                                            </div>
+                <div className="card card-raised mb-5">
+                    <div className="card-header bg-transparent px-2">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div className="me-4">
+                                <h2 className="card-title mb-0">List de partenaires</h2>
+                                <div className="card-subtitle"><i className="bi-building-fill" style={{paddingLeft: "-10px"}}></i> Lieu d'activité : {userprofile.lieudemission}</div>
+                            </div>
+                            {/* <div className="d-flex gap-5">
+                                <div className="card-tools">
+                                    <div className="input-group input-group-sm">
+                                        <input type="text" name="associate_search" className="form-control float-right" placeholder="Recherche" />
+                                        <div className="input-group-append">
+                                            <button type="submit" className="btn btn-secondary">Rechercher</button>
                                         </div>
                                     </div>
-                                    {/* <button className="btn btn-primary" type="button">Ajouter Partenaire</button> */}
                                 </div>
-                            </div>
+                                <button className="btn btn-primary" type="button">Ajouter Partenaire</button>
+                            </div> */}
                         </div>
-                        <AssociatesList fetchAssoc={fetchAssoc} userprofile={userprofile} key={userprofile.id} />
                     </div>
+                    <AssociatesList fetchAssoc={fetchAssoc} userprofile={userprofile} key={userprofile.id} />
+                </div>
 
                 <div className="card card-raised">
                     <div className="card-header bg-transparent px-2">
@@ -229,7 +253,7 @@ const Superviseur = ({userprofile}) => {
                         </div>
                     </div>
                     
-                    <AdherentList adherents={searchFilter} userprofile={userprofile} key={userprofile.id}  />
+                    <AdherentList adherents={searchFilter} userprofile={userprofile} key={userprofile.id} setFetchData={setFetchData}  />
                     {/* <AdherentList adherents={currentPeople} userprofile={userprofile} searchFilter={searchFilter} /> */}
                     <Pagination totalPerson={fetchData.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} key={userprofile.id}  />
                 </div>

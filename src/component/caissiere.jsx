@@ -12,7 +12,8 @@ const Caissiere = ({userprofile}) => {
     const navigate = useNavigate();
     const { user } = useAuth();
     let userId = user.id;
-    const [adherent, setAdherent] = useState([]);
+    const [adherents, setAdherents] = useState([]);
+    const [solde, setSolde] = useState('');
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState([]);
     const [fetchError, setFetchError] = useState(null);
@@ -21,13 +22,13 @@ const Caissiere = ({userprofile}) => {
 
     const fetchPersons = async () => {
         try{
-            const {data,error} = await supabase.from('dvenrollment').select(`*, dvrelatives(*), dvtransaction(*)`).eq('centrenroll', userprofile?.lieudemission).order('created_at', { ascending: true });
+            const {data,error} = await supabase.from('dvenrollment').select(`*, dvrelatives(*), dvtransaction(*)`).eq('centrenroll', userprofile?.lieudemission).order('created_at', { ascending: false });
             // const {data,error} = await supabase.from('dvenrollment').select().eq('centrenroll', userprofile?.lieudemission).order('created_at', { ascending: true });
     
             if(error){
                 throw new Error("Could not fetch data.");
             }
-            setAdherent(data);
+            setAdherents(data);
             setFetchError(null);
             setTimeout(() => {
                 setLoading(false)
@@ -35,7 +36,7 @@ const Caissiere = ({userprofile}) => {
         }
         catch(error){
             setFetchError(error.message);
-            setAdherent(null);
+            setAdherents(null);
         }
     };
 
@@ -45,7 +46,7 @@ const Caissiere = ({userprofile}) => {
 
     const lastPostIndex = currentPage * personPerPage;
     const firstPostIndex = lastPostIndex - personPerPage;
-    const currentPeople = adherent?.slice(firstPostIndex, lastPostIndex);
+    const currentPeople = adherents?.slice(firstPostIndex, lastPostIndex);
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -70,6 +71,35 @@ const Caissiere = ({userprofile}) => {
     const date = new Date();
     const hour = date.getHours();
     let todayDate = new Date().toDateString();
+
+    const dateDuJour = new Date().toLocaleDateString();
+    let nbSolde = 0;
+    let statJour = 0;
+    let enCaisseJour = 0;
+    let enCaisseTotal = 0;
+    let recudepot = 0
+    adherents.map((adherent) => {
+        (adherent.dvtransaction).map((transactionEvent) => {
+            const dbDate = new Date(transactionEvent.created_at).toLocaleDateString();
+            if(dbDate === dateDuJour){
+                enCaisseJour += transactionEvent.depots;
+                statJour++;
+            }
+            enCaisseTotal += transactionEvent.depots;
+    
+            if(adherent.id === transactionEvent.adherent_id){
+                recudepot += transactionEvent.depots;
+                
+                console.log(recudepot);
+                console.log(solde);
+                // si mtDu === mtVerse alor solde
+                if(solde === recudepot){
+                    nbSolde += nbSolde + 1;
+                }
+            }
+        })
+    });
+    // console.log(nbSolde);
 
     if(loading){
       return(<LoadingPage />);
@@ -98,17 +128,10 @@ const Caissiere = ({userprofile}) => {
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <div className="me-2">
-                                    <div className="display-5">101.1K</div>
-                                    <div className="card-text">Nombre Total d'Adhérents</div>
+                                    <div className="display-5">{statJour}</div>
+                                    <div className="card-text">Nombre de versements</div>
                                 </div>
-                                <div className="icon-circle bg-primary text-white"><i className="material-icons">download</i></div>
-                            </div>
-                            <div className="card-text">
-                                <div className="d-inline-flex align-items-center">
-                                    <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                    <div className="caption text-success fw-500 me-2">3%</div>
-                                    <div className="caption">from last month</div>
-                                </div>
+                                <div className="icon-circle text-black"><i className="bi bi-person-down" style={{fontSize: "4rem", color:"black"}}></i></div>
                             </div>
                         </div>
                     </div>
@@ -118,17 +141,10 @@ const Caissiere = ({userprofile}) => {
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <div className="me-2">
-                                    <div className="display-5">12.2K</div>
-                                    <div className="card-text">Nb Adherent ayant effectuer des versements</div>
+                                    <div className="display-5">{enCaisseJour}</div>
+                                    <div className="card-text">Encaissement du jour</div>
                                 </div>
-                                <div className="icon-circle bg-warning text-white"><i className="material-icons">storefront</i></div>
-                            </div>
-                            <div className="card-text">
-                                <div className="d-inline-flex align-items-center">
-                                    <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                    <div className="caption text-success fw-500 me-2">3%</div>
-                                    <div className="caption">from last month</div>
-                                </div>
+                                <div className="icon-circle text-black"><i className="bi bi-cash-coin" style={{fontSize: "4rem", color:"black"}}></i></div>
                             </div>
                         </div>
                     </div>
@@ -138,17 +154,10 @@ const Caissiere = ({userprofile}) => {
                         <div className="card-body px-4">
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <div className="me-2">
-                                    <div className="display-5">5.3K</div>
-                                    <div className="card-text">Nb Adherent ayant solde</div>
+                                    <div className="display-5">{enCaisseTotal}</div>
+                                    <div className="card-text">Encaissement Total</div>
                                 </div>
-                                <div className="icon-circle bg-secondary text-white"><i className="material-icons">people</i></div>
-                            </div>
-                            <div className="card-text">
-                                <div className="d-inline-flex align-items-center">
-                                    <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                    <div className="caption text-success fw-500 me-2">3%</div>
-                                    <div className="caption">from last month</div>
-                                </div>
+                                <div className="icon-circle text-black"><i className="bi bi-piggy-bank" style={{fontSize: "4rem", color:"black"}}></i></div>
                             </div>
                         </div>
                     </div>
@@ -159,16 +168,9 @@ const Caissiere = ({userprofile}) => {
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <div className="me-2">
                                     <div className="display-5">7</div>
-                                    <div className="card-text">Encaissement du jour</div>
+                                    <div className="card-text">Nb Adherent ayant solde</div>
                                 </div>
-                                <div className="icon-circle bg-info text-white"><i className="material-icons">devices</i></div>
-                            </div>
-                            <div className="card-text">
-                                <div className="d-inline-flex align-items-center">
-                                    <i className="material-icons icon-xs text-success">arrow_upward</i>
-                                    <div className="caption text-success fw-500 me-2">3%</div>
-                                    <div className="caption">from last month</div>
-                                </div>
+                                <div className="icon-circle text-black"><i className="bi bi-person-lines-fill" style={{fontSize: "4rem", color:"black"}}></i></div>
                             </div>
                         </div>
                     </div>
@@ -206,16 +208,17 @@ const Caissiere = ({userprofile}) => {
                             <th scope="col"> Montant Dû </th>
                             <th scope="col"> Montant Versé </th>
                             <th scope="col"> Reste à payer </th>
-                            <th scope="col"> Actions </th>
+                            <th scope="col"> Statut </th>
+                            <th scope="col"> Action </th>
                         </tr>
                     </thead>
                     <tbody>
                     {searchFilter.map((adherent) => (
-                        <PaymentList adherent={adherent} key={adherent.id} />
+                        <PaymentList adherent={adherent} key={adherent.id} setSolde={setSolde} />
                     ))}
                     </tbody>
                 </table>
-                <Pagination totalPerson={adherent?.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+                <Pagination totalPerson={adherents?.length} personPerPage={personPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} />
                 </div>
         </div>
         </>

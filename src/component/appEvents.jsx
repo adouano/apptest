@@ -46,6 +46,7 @@ const AppEventsLogs = () => {
                             {events.map((appevent) => (
                             <tr key={appevent.id}>
                                 <td className="text-body-secondary">{new Date(appevent.created_at).toLocaleString()}</td>
+                                <td className="text-body-secondary">{appevent.role}</td>
                                 <td className="text-body-secondary">{appevent.action}</td>
                                 <td className="text-body-secondary">{appevent.note}</td>
                             </tr>
